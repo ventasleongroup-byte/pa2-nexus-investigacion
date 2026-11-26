@@ -52,7 +52,7 @@ const DEV = ['127.0.0.1', 'localhost'].includes(location.hostname);
 const ROOM = (() => {
   const m = location.hash.match(/sala=([A-Za-z0-9_-]{16,64})/);
   if (m) { try { history.replaceState(null, '', location.pathname + location.search); } catch {} }
-  try { if (m) { localStorage.setItem('pa2.room', m[1]); return m[1]; } return localStorage.getItem('pa2.room') || ''; } catch { return m ? m[1] : ''; }
+  try { if (m) { if (!FINAL) localStorage.setItem('pa2.room', m[1]); return m[1]; } return localStorage.getItem('pa2.room') || ''; } catch { return m ? m[1] : ''; }
 })();
 const COLLAB = !!ROOM && !FINAL;           // con clave de sala: edición colaborativa. Sin clave: vista pública de solo lectura (content.json).
 let base = {};                   // contenido final publicado (solo lectura)
@@ -75,7 +75,8 @@ function symbalooSrc(raw) {
   u = safeUrl(u);
   if (!u) return { src: '', embeddable: false };
   const x = new URL(u);
-  if (x.protocol !== 'https:' || x.hostname !== 'www.symbaloo.com') return { src: '', embeddable: false };
+  if (x.protocol !== 'https:' || !['symbaloo.com', 'www.symbaloo.com'].includes(x.hostname)) return { src: '', embeddable: false };
+  x.hostname = 'www.symbaloo.com';
   if (/^\/shared\//.test(x.pathname)) return { src: x.href, embeddable: false };
   x.pathname = x.pathname.replace(/^\/mix\//, '/embed/');
   return { src: x.href, embeddable: /^\/embed\//.test(x.pathname) };
@@ -175,7 +176,7 @@ function studentBlock(s) {
     ${[1, 2].map((i) => `<div class="fig" data-render="img" data-s="${s.n}" data-i="${i}"></div>
       <div class="edit-only">${uploader(`${k}.img${i}.file`, `Imagen ${i} (subir archivo)`)}${line(`${k}.img${i}.url`, `Imagen ${i} · o enlace directo a la imagen`, { type: 'url' })}
         ${line(`${k}.img${i}.titulo`, `Imagen ${i} · título`)}${line(`${k}.img${i}.fuente`, `Imagen ${i} · fuente (texto)`)}${line(`${k}.img${i}.fuenteurl`, `Imagen ${i} · enlace de la fuente`, { type: 'url' })}</div>`).join('')}
-    <div class="fig" data-render="video" data-s="${s.n}"></div>
+    <div class="fig"><div data-render="vidhead" data-s="${s.n}"></div><div data-render="vidframe" data-s="${s.n}"></div><div data-render="vidnote" data-s="${s.n}"></div></div>
     <div class="edit-only">${line(`${k}.vid.url`, 'Video · enlace de YouTube', { type: 'url' })}${line(`${k}.vid.titulo`, 'Video · título')}${line(`${k}.vid.fuente`, 'Video · fuente (canal / autor)')}${line(`${k}.vid.fuenteurl`, 'Video · enlace de la fuente', { type: 'url' })}</div>
     <div class="field"><div class="view-only" data-render="autor" data-s="${s.n}"></div>
       <div class="edit-only">${line(`${k}.nombre`, 'Autor (apellidos y nombres)')}</div></div>
@@ -257,12 +258,17 @@ const RENDER = {
       <img src="${esc(src)}" alt="${esc(get(`${key}.titulo`) || 'Imagen del subtema')}" loading="lazy">
       <div class="cap"><em>Nota.</em> ${esc(get(`${key}.fuente`) || 'Fuente pendiente')}. ${link(get(`${key}.fuenteurl`), get(`${key}.fuenteurl`))}</div>`;
   },
-  video(el) {
-    const k = `s${el.dataset.s}.vid`, id = ytId(get(`${k}.url`));
-    if (!id) { el.innerHTML = PENDING(`Video del subtema ${el.dataset.s}`); return; }
-    el.innerHTML = `<div class="cap" style="margin:0 0 6px"><span class="n">Video</span><br><em>${esc(get(`${k}.titulo`) || 'Título pendiente')}</em></div>
-      <div class="ytwrap"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="${esc(get(`${k}.titulo`) || 'Video')}" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <div class="cap"><em>Nota.</em> ${esc(get(`${k}.fuente`) || 'Fuente pendiente')}. ${link(get(`${k}.fuenteurl`) || get(`${k}.url`), get(`${k}.fuenteurl`) || get(`${k}.url`))}</div>`;
+  vidhead(el) {
+    const k = `s${el.dataset.s}.vid`;
+    el.innerHTML = ytId(get(`${k}.url`)) ? `<div class="cap" style="margin:0 0 6px"><span class="n">Video</span><br><em>${esc(get(`${k}.titulo`) || 'Título pendiente')}</em></div>` : PENDING(`Video del subtema ${el.dataset.s}`);
+  },
+  vidframe(el) {
+    const id = ytId(get(`s${el.dataset.s}.vid.url`));
+    el.innerHTML = id ? `<div class="ytwrap"><iframe src="https://www.youtube-nocookie.com/embed/${id}" title="Video del subtema ${esc(el.dataset.s)}" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>` : '';
+  },
+  vidnote(el) {
+    const k = `s${el.dataset.s}.vid`;
+    el.innerHTML = ytId(get(`${k}.url`)) ? `<div class="cap"><em>Nota.</em> ${esc(get(`${k}.fuente`) || 'Fuente pendiente')}. ${link(get(`${k}.fuenteurl`) || get(`${k}.url`), get(`${k}.fuenteurl`) || get(`${k}.url`))}</div>` : '';
   },
   autor(el) { el.innerHTML = `<p class="lead" style="margin:6px 0 0"><b>Autor:</b> ${esc(get(`s${el.dataset.s}.nombre`))}</p>`; },
   refs(el) {
@@ -396,7 +402,7 @@ function show(n) {
   current = n;
 }
 async function route() {
-  if (!/#\/\d/.test(location.hash)) return;
+  if (location.hash && !/^#\/\d/.test(location.hash)) return;
   const n = Math.min(5, Math.max(1, parseInt((location.hash.match(/#\/(\d)/) || [])[1] || '1', 10)));
   if (n === current) return;
   document.getElementById('nav').classList.remove('open');
@@ -473,7 +479,7 @@ function init() {
     e.target.value = ''; syncInputs(); refreshViews(); renderChecklist(); renderFooter(); applyLogo();
   });
   document.getElementById('btn-leave')?.addEventListener('click', () => {
-    if (confirm('¿Salir de la sala del equipo en este navegador? Tu copia local se conserva y podrás volver con el enlace del equipo.')) { try { localStorage.removeItem('pa2.room'); } catch {} location.href = location.pathname; }
+    if (confirm('¿Salir de la sala del equipo en este navegador? Tu copia local se conserva y podrás volver con el enlace del equipo.')) { C.flush(); try { localStorage.removeItem('pa2.room'); } catch {} location.href = location.pathname; }
   });
   document.getElementById('btn-share').addEventListener('click', async () => {
     const url = `${location.origin}${location.pathname}#sala=${ROOM}`;
@@ -497,7 +503,7 @@ function init() {
   }));
 
   if (COLLAB) wireCollab();
-  window.addEventListener('hashchange', route);
+  window.addEventListener('hashchange', () => { const k = location.hash.match(/sala=([A-Za-z0-9_-]{16,64})/); if (k) { try { if (!FINAL) localStorage.setItem('pa2.room', k[1]); } catch {} history.replaceState(null, '', location.pathname + location.search); location.reload(); } else route(); });
   initScene(document.getElementById('scene'), document.getElementById('hero'), { reduced });
   const start = Math.min(5, Math.max(1, parseInt((location.hash.match(/#\/(\d)/) || [])[1] || '1', 10)));
   show(start);
@@ -550,6 +556,6 @@ function askWho() {
 
 (async () => {
   if (COLLAB) { try { await C.start(ROOM); } catch (e) { console.error('colaboración', e); } }
-  else { try { const r = await fetch('content.json', { cache: 'no-cache' }); if (r.ok) base = (await r.json()).fields || {}; } catch {} }
+  else { try { const r = await fetch('content.json', { cache: 'no-cache' }); if (r.ok) { const j = await r.json(); base = j && j.fields && typeof j.fields === 'object' ? j.fields : {}; } } catch {} }
   try { init(); } catch (e) { console.error('init', e); document.getElementById('pages').innerHTML = '<p class="pending">No se pudo mostrar el sitio. Recarga la página.</p>'; }
 })();

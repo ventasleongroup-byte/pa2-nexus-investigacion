@@ -3,14 +3,14 @@
 Static site, no build step. Three.js r170 is vendored in `vendor/`.
 
 ## Run locally
-`python -m http.server 8765 --bind 127.0.0.1` in this folder (loopback only), then open http://127.0.0.1:8765/#sala=TESTROOM0123456789ab (ES modules do not run from `file://`).
+`python -m http.server 8765 --bind 127.0.0.1` in this folder (loopback only), then open http://127.0.0.1:8765/#sala=<a random key you generate locally> (ES modules do not run from `file://`).
 
 ## Real-time collaboration (no server, no database)
 - Team link = site URL + `#sala=<secret key>` (the key lives OUTSIDE this folder, in `../.sala_web.txt`; never commit it or put it in the served folder).
 - Every browser holds a Yjs CRDT document, synced peer-to-peer over WebRTC (Trystero/Nostr relays only help peers find each other;
   the room id sent to the relays is a SHA-256 hash, the key encrypts the signalling). Local copy in IndexedDB.
 - Edits made while alone are kept locally and merge automatically the next time two people are online at once.
-- **Descargar aportes** exports every text and photo (JSON, photos as base64) for the final build; **Importar aportes** merges a JSON back in.
+- **Descargar aportes** exports every text and photo (JSON, photos as base64) for the final build; **Importar aportes** restores a JSON (it OVERWRITES the fields it contains, for everyone).
 - Without a key the site is read-only and shows `content.json` (the baked final content).
 - Rebuild vendor bundle: `esbuild` entry exporting `yjs` + `@trystero-p2p/nostr` (trystero 0.27.0, yjs 13.6.33) -> `vendor/collab.js`.
 

@@ -22,7 +22,11 @@ const emit = (type, ...a) => listeners[type].forEach((fn) => { try { fn(...a); }
 export function getVal(id) {
   if (cache.has(id)) return cache.get(id);
   let v;
-  if (kindOf(id) === 'map') v = files.has(id) ? files.get(id) : DEFAULTS[id] ?? '';
+  if (kindOf(id) === 'map') {
+    if (files.has(id)) v = files.get(id);
+    else if (hasDefault(id) && touched.has(id)) v = doc.getText(id).toString(); // dato escrito con la versión anterior (Y.Text)
+    else v = DEFAULTS[id] ?? '';
+  }
   else v = hasDefault(id) && !touched.has(id) ? DEFAULTS[id] : doc.getText(id).toString();
   v = typeof v === 'string' ? v : '';
   cache.set(id, v);
@@ -70,7 +74,10 @@ const idb = () => (idbP ||= new Promise((res, rej) => { const r = indexedDB.open
 const idbGet = async (k) => { try { const d = await idb(); return await new Promise((r) => { const q = d.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => r(q.result); q.onerror = () => r(undefined); }); } catch { return undefined; } };
 let saveFailed = false;
 const idbSet = async (k, v) => { try { const d = await idb(); await new Promise((res, rej) => { const tx = d.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = res; tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error); }); if (saveFailed) { saveFailed = false; pushStatus(); } } catch { if (!saveFailed) { saveFailed = true; pushStatus(); } } };
-async function persistNow() { try { const stored = await idbGet(dbKey); if (stored) Y.applyUpdate(doc, stored, 'load'); } catch { /* copia ilegible */ } await idbSet(dbKey, Y.encodeStateAsUpdate(doc)); }
+async function persistNow() {
+  try { const stored = await idbGet(dbKey); if (stored) { const before = Y.encodeStateVector(doc); Y.applyUpdate(doc, stored, 'load'); if (sendUpd) { const diff = Y.encodeStateAsUpdate(doc, before); if (diff.length > 2) sendUpd.send(diff).catch(() => {}); } } } catch { /* copia ilegible */ }
+  await idbSet(dbKey, Y.encodeStateAsUpdate(doc));
+}
 
 /* ---------- Red ---------- */
 let room = null, dbKey = '', persistT = 0, sendUpd = null, sendPres = null, me = { name: 'Invitado', focus: '' };
@@ -90,6 +97,7 @@ doc.on('update', (u, origin) => {
 });
 
 export async function start(roomKey) {
+  if (!globalThis.crypto?.subtle) { saveFailed = true; throw new Error('contexto no seguro: usa https'); }
   const digest = hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(roomKey)));
   dbKey = 'doc:' + digest.slice(0, 16);
   const saved = await idbGet(dbKey);
@@ -97,7 +105,7 @@ export async function start(roomKey) {
   try {
     room = joinRoom({ appId: APP_ID, password: roomKey }, digest.slice(0, 24));
     sendUpd = room.makeAction('upd'); sendPres = room.makeAction('pres');
-    sendUpd.onMessage((data) => { if (data?.byteLength > 64e6 || data?.length > 64e6) return; try { Y.applyUpdate(doc, data instanceof Uint8Array ? data : new Uint8Array(data), 'remote'); } catch (e) { console.error('update inválido', e); } });
+    sendUpd.onMessage((data) => { if (!(data instanceof Uint8Array || data instanceof ArrayBuffer) || data.byteLength > 64e6) return; try { Y.applyUpdate(doc, data instanceof Uint8Array ? data : new Uint8Array(data), 'remote'); } catch (e) { console.error('update inválido', e); } });
     sendPres.onMessage((d, ctx) => { if (!d || typeof d !== 'object') return; presence.set(ctx.peerId, { name: String(d.name ?? '').slice(0, 24), focus: String(d.focus ?? '').slice(0, 80), t: Date.now() }); pushPresence(); });
     room.onPeerJoin(({ peerId }) => {
       sendUpd.send(Y.encodeStateAsUpdate(doc), { target: peerId }).catch(() => {});
@@ -114,5 +122,6 @@ export function setMe(patch) {
   if (sendPres) sendPres.send(me).catch(() => {});
 }
 
-addEventListener('pagehide', () => { if (dbKey) { clearTimeout(persistT); persistNow(); } });
-document.addEventListener('visibilitychange', () => { if (document.hidden && dbKey) { clearTimeout(persistT); persistNow(); } });
+export const flush = () => { if (dbKey) { clearTimeout(persistT); idbSet(dbKey, Y.encodeStateAsUpdate(doc)); } };
+addEventListener('pagehide', flush);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
