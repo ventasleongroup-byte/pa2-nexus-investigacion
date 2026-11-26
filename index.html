@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; frame-src https://www.youtube-nocookie.com https://www.symbaloo.com; connect-src 'self' wss: https:; base-uri 'self'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Gestión de inventarios y herramientas digitales en las MYPES</title>
+<meta name="description" content="Sitio de investigación académica sobre la gestión de inventarios y el uso de herramientas digitales en las micro y pequeñas empresas (MYPES).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2310285a'/%3E%3Cpath d='M16 6l9 5v10l-9 5-9-5V11z' fill='none' stroke='%2365d9df' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/styles.css">
+<script src="js/theme-init.js"></script>
+</head>
+<body data-page="1">
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<nav class="nav" id="nav" aria-label="Principal">
+  <a class="brand" href="#/1"><span class="logo" id="brand-logo" title="Logotipo del equipo (se agrega en modo edición)">LOGO</span><span class="t">Nexus · Investigación PA2</span></a>
+  <button class="ibtn burger" id="burger" aria-label="Abrir menú" aria-expanded="false">☰ Menú</button>
+  <ul id="menu">
+    <li><a class="link" href="#/1">1 · Presentación</a></li>
+    <li><a class="link" href="#/2">2 · Contenido académico</a></li>
+    <li><a class="link" href="#/3">3 · Aprendizaje colaborativo</a></li>
+    <li><a class="link" href="#/4">4 · Conclusiones</a></li>
+    <li><a class="link" href="#/5">5 · Autoría</a></li>
+  </ul>
+  <div class="tools"><span id="presence" class="pres" aria-live="polite"></span>
+    <button class="ibtn" id="btn-theme" aria-label="Cambiar entre modo claro y modo oscuro">◐ <span id="theme-lbl">Claro</span></button>
+    <button class="ibtn" id="btn-edit" aria-pressed="false" aria-label="Activar modo edición">✎ Editar</button>
+  </div>
+</nav>
+
+<div id="bar-edit" role="region" aria-label="Herramientas de colaboración">
+  <span id="sync-status" data-state="wait">Conectando…</span>
+  <button class="btn" id="btn-share">🔗 Copiar enlace del equipo</button>
+  <button class="btn" id="btn-export">⬇ Descargar aportes</button>
+  <label class="btn" for="file-import">⬆ Importar aportes</label>
+  <input id="file-import" class="sr" type="file" accept="application/json">
+</div>
+
+<header class="hero" id="hero">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="hero-in">
+    <div class="hero-copy">
+      <span class="kicker" id="kicker">Página 1 · Presentación</span>
+      <h1 id="hero-title">Gestión de inventarios y herramientas digitales en las micro y pequeñas empresas (MYPES)</h1>
+      <p class="sub" id="hero-sub">Producto Académico 2 · Estrategias y Herramientas Digitales para el Aprendizaje</p>
+      <div class="meta"><span>Equipo <b>Nexus</b></span><span>·</span><span>Universidad Continental</span><span>·</span><span>Perú, 2026</span></div>
+    </div>
+    <div aria-hidden="true"></div>
+  </div>
+  <div class="scene-hint" aria-hidden="true"><i></i><span>Mueve el cursor</span></div>
+</header>
+
+<main id="main" class="panel" tabindex="-1"><div class="layout"><div class="wrap" id="pages"></div><aside id="checklist" aria-label="Lista de tareas pendientes del equipo"></aside></div></main>
+
+<footer class="site"><div class="in" id="site-footer"></div></footer>
+
+<button class="ibtn" id="cl-toggle" style="background:var(--accent);color:var(--accent-ink);border-color:var(--accent)" aria-expanded="true">☑ Checklist</button>
+
+<div id="tr" aria-hidden="true"><div id="tr-art"></div><div class="lbl" id="tr-lbl"></div></div>
+
+<script type="module" src="js/app.js"></script>
+<noscript><p style="padding:2rem">Este sitio necesita JavaScript para mostrarse.</p></noscript>
+</body>
+</html>
