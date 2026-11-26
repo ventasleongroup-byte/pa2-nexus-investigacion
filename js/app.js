@@ -51,21 +51,23 @@ const RANGES = { intro: [30, 70], cdir: [30, 84], cpar: [30, 70], analisis: [30,
 const DEV = ['127.0.0.1', 'localhost'].includes(location.hostname);
 const ROOM = (() => {
   const m = location.hash.match(/sala=([A-Za-z0-9_-]{16,64})/);
+  if (m) { try { history.replaceState(null, '', location.pathname + location.search); } catch {} }
   try { if (m) { localStorage.setItem('pa2.room', m[1]); return m[1]; } return localStorage.getItem('pa2.room') || ''; } catch { return m ? m[1] : ''; }
 })();
-const COLLAB = !!ROOM;           // con clave de sala: edición colaborativa. Sin clave: vista pública de solo lectura (content.json).
+const COLLAB = !!ROOM && !FINAL;           // con clave de sala: edición colaborativa. Sin clave: vista pública de solo lectura (content.json).
 let base = {};                   // contenido final publicado (solo lectura)
 C.setDefaults(DEFAULTS);
-const get = (id) => (COLLAB ? C.getVal(id) : id in base ? base[id] : DEFAULTS[id] ?? '');
+const get = (id) => String(COLLAB ? C.getVal(id) : id in base ? base[id] ?? '' : DEFAULTS[id] ?? '');
 const set = (id, v) => { if (COLLAB) C.setVal(id, v); };
-const updated = () => (COLLAB ? C.lastUpdate() : (base._u || '').slice(0, 10)) || CONFIG.BUILD_DATE;
+const updated = () => { const d = String((COLLAB ? C.lastUpdate() : base._u) || '').slice(0, 10); return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : CONFIG.BUILD_DATE; };
 const ME_KEY = 'pa2.me';
 let ME = ''; try { ME = localStorage.getItem(ME_KEY) || ''; } catch {}
 
 /* ================= Utilidades ================= */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const wc = (s) => (s || '').trim().split(/\s+/).filter(Boolean).length;
-const safeUrl = (u) => { try { const x = new URL(u, location.href); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch { return ''; } };
+const safeUrl = (u) => { if (!u || !String(u).trim()) return ''; try { const x = new URL(String(u).trim()); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch { return ''; } };
+const fileOf = (id) => { const v = get(id); return typeof v === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,/.test(v) ? v : ''; };
 const ytId = (u) => (u || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/)?.[1] || '';
 function symbalooSrc(raw) {
   // Devuelve { src, embeddable }. Los enlaces /shared/ no se pueden incrustar (X-Frame-Options); solo el código «Insertar» (/embed/).
@@ -73,7 +75,7 @@ function symbalooSrc(raw) {
   u = safeUrl(u);
   if (!u) return { src: '', embeddable: false };
   const x = new URL(u);
-  if (!/(^|\.)symbaloo\.com$/.test(x.hostname)) return { src: '', embeddable: false };
+  if (x.protocol !== 'https:' || x.hostname !== 'www.symbaloo.com') return { src: '', embeddable: false };
   if (/^\/shared\//.test(x.pathname)) return { src: x.href, embeddable: false };
   x.pathname = x.pathname.replace(/^\/mix\//, '/embed/');
   return { src: x.href, embeddable: /^\/embed\//.test(x.pathname) };
@@ -86,6 +88,7 @@ function toast(msg) {
   t.textContent = msg; t.style.display = 'block'; clearTimeout(toast._t); toast._t = setTimeout(() => (t.style.display = 'none'), 4200);
 }
 async function fileToDataURL(file, max = 1280, q = 0.78) {
+  if (file.size > 25 * 1024 * 1024) throw new Error('too big');
   const bmp = await createImageBitmap(file);
   const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
   const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
@@ -105,9 +108,9 @@ function para(id, label, { hint = '', range = null, rows = 5 } = {}) {
       <div class="hint"><span>${esc(hint)}</span><span class="cnt" data-cnt="${id}" ${range ? `data-min="${range[0]}" data-max="${range[1]}"` : ''}></span></div>
     </div></div>`;
 }
-function line(id, label, { ph = '', type = 'text', hint = '' } = {}) {
-  return `<div class="field"><label for="f-${id}">${esc(label)}</label>
-    <input id="f-${id}" type="${type}" data-id="${id}" value="${esc(get(id))}" placeholder="${esc(ph)}">
+function line(id, label, { ph = '', type = 'text', hint = '', dom = 'f-' } = {}) {
+  return `<div class="field"><label for="${dom}${id}">${esc(label)}</label>
+    <input id="${dom}${id}" type="${type}" data-id="${id}" value="${esc(get(id))}" placeholder="${esc(ph)}">
     ${hint ? `<div class="hint"><span>${esc(hint)}</span></div>` : ''}</div>`;
 }
 function uploader(id, label) {
@@ -212,7 +215,7 @@ const page5 = () => `<section class="page" data-p="5" aria-labelledby="t5">
   <h2 id="t5">Autoría</h2><div class="rule"></div>
   <h3>Perfil profesional</h3>
   <div class="grid2">${STUDENTS.map((s) => `<article class="card"><div data-render="perfil" data-s="${s.n}"></div>
-    <div class="edit-only">${uploader(`s${s.n}.foto`, 'Fotografía formal (optimizada con IA, Gemini)')}${line(`s${s.n}.nombre`, 'Apellidos y nombres completos')}${line(`s${s.n}.carrera`, 'Carrera profesional')}${line(`s${s.n}.nacimiento`, 'Lugar de nacimiento')}</div></article>`).join('')}</div>
+    <div class="edit-only">${uploader(`s${s.n}.foto`, 'Fotografía formal (optimizada con IA, Gemini)')}${line(`s${s.n}.nombre`, 'Apellidos y nombres completos', { dom: 'f5-' })}${line(`s${s.n}.carrera`, 'Carrera profesional')}${line(`s${s.n}.nacimiento`, 'Lugar de nacimiento')}</div></article>`).join('')}</div>
   <h3>Entorno Personal de Aprendizaje (PLE)</h3>
   <div class="card"><div data-render="symbaloo"></div>
     <div class="edit-only">${line('symbaloo.url', 'Enlace o código de inserción (iframe) de tu Symbaloo', { ph: 'https://www.symbaloo.com/mix/…', hint: 'Usa Compartir → Incrustar (Embed) en Symbaloo y pega el código iframe. Los enlaces «shared» no se pueden incrustar. Debe incluir la categoría «Producción académica».' })}
@@ -227,7 +230,7 @@ function figureNumbers() {
   order.forEach((key) => { const ok = key === 'fig1' || imgSrc(key); if (ok) map[key] = ++n; });
   return map;
 }
-const imgSrc = (key) => get(`${key}.file`) || safeUrl(get(`${key}.url`));
+const imgSrc = (key) => fileOf(`${key}.file`) || safeUrl(get(`${key}.url`));
 const link = (u, t) => (safeUrl(u) ? `<a href="${esc(safeUrl(u))}" target="_blank" rel="noopener noreferrer">${esc(t || u)}</a>` : esc(t || ''));
 
 const RENDER = {
@@ -268,13 +271,13 @@ const RENDER = {
     el.innerHTML = uniq.length ? uniq.map((r) => `<li>${esc(r)}</li>`).join('') : `<li>${PENDING('Las referencias aparecen aquí al completar las citas')}</li>`;
   },
   evid(el) {
-    const k = el.dataset.k, src = get(`ev.${k}.file`);
+    const k = el.dataset.k, src = fileOf(`ev.${k}.file`);
     el.innerHTML = `<h3 style="margin:0 0 8px;font-size:1rem">${esc(el.dataset.l)}</h3>` + (src
       ? `<div class="fig"><img src="${esc(src)}" alt="${esc(el.dataset.l)}" loading="lazy"><div class="cap"><span class="n">Evidencia ${el.dataset.i}.</span> ${esc(get(`ev.${k}.pie`))}</div></div>`
       : PENDING('Captura de pantalla'));
   },
   perfil(el) {
-    const k = `s${el.dataset.s}`, foto = get(`${k}.foto.file`);
+    const k = `s${el.dataset.s}`, foto = fileOf(`${k}.foto.file`);
     el.innerHTML = `<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
       <div style="width:112px;height:140px;border-radius:12px;overflow:hidden;border:1px solid var(--line);flex:none;background:var(--bg);display:grid;place-items:center;color:var(--muted);font-size:.7rem;text-align:center">${foto ? `<img src="${esc(foto)}" alt="Fotografía de ${esc(get(`${k}.nombre`))}" style="width:100%;height:100%;object-fit:cover">` : 'Foto pendiente'}</div>
       <div style="min-width:0;flex:1"><h3 style="margin:0 0 6px;font-size:1.05rem">${esc(get(`${k}.nombre`))}</h3>
@@ -290,7 +293,16 @@ const RENDER = {
       : `<div class="pending"><b>Este enlace no se puede incrustar.</b> Symbaloo bloquea los enlaces «compartidos». En Symbaloo abre tu webmix → Compartir → <b>Incrustar (Embed)</b> y pega aquí el código completo.<br><a class="btn pri" style="margin-top:10px" href="${esc(src)}" target="_blank" rel="noopener noreferrer">Abrir el PLE en Symbaloo</a></div>`;
   },
 };
-function refreshViews() { document.querySelectorAll('[data-render]').forEach((el) => RENDER[el.dataset.render]?.(el)); refreshCounters(); }
+const lastHtml = new WeakMap();
+function refreshViews() {
+  document.querySelectorAll('[data-render]').forEach((el) => {
+    const fn = RENDER[el.dataset.render]; if (!fn) return;
+    const probe = el.cloneNode(false); fn(probe);
+    const html = probe.innerHTML;
+    if (lastHtml.get(el) !== html) { lastHtml.set(el, html); el.innerHTML = html; }
+  });
+  refreshCounters();
+}
 
 /* ================= Contadores ================= */
 function refreshCounters() {
@@ -309,7 +321,7 @@ const inRange = (id, [a, b]) => { const w = wc(get(id)); return w >= a && w <= b
 function buildChecklist() {
   const L = [];
   const add = (page, group, label, done, go, manual) => L.push({ page, group, label, done, go, manual });
-  add(1, 'Presentación', 'Logotipo del equipo', () => has('logo.file'), 'logo-card');
+  add(1, 'Presentación', 'Logotipo del equipo', () => !!fileOf('logo.file'), 'logo-card');
   add(1, 'Presentación', 'Figura interactiva con título y fuente con enlace', () => has('fig1.titulo') && has('fig1.fuente') && !!safeUrl(get('fig1.url')), 'holo');
   [['p1', 'Párrafo 1 · Resumen de la problemática'], ['p2', 'Párrafo 2 · Importancia del tema'], ['p3', 'Párrafo 3 · Estructura del sitio'], ['p4', 'Párrafo 4 · Limitaciones']]
     .forEach(([id, l]) => add(1, 'Presentación', l, () => wc(get(id)) >= 25, `f-${id}`));
@@ -324,10 +336,10 @@ function buildChecklist() {
     add(2, g, '2 imágenes con título y fuente con enlace', () => [1, 2].every((i) => imgSrc(`${k}.img${i}`) && has(`${k}.img${i}.titulo`) && has(`${k}.img${i}.fuente`) && safeUrl(get(`${k}.img${i}.fuenteurl`))), `stu-${s.n}`);
     add(2, g, '1 video con título y fuente con enlace', () => !!ytId(get(`${k}.vid.url`)) && has(`${k}.vid.titulo`) && has(`${k}.vid.fuente`) && !!safeUrl(get(`${k}.vid.fuenteurl`) || get(`${k}.vid.url`)), `stu-${s.n}`);
   });
-  [['cal', 'Captura de Google Calendar'], ['meet', 'Captura de Meet con cámaras activadas'], ['chat', 'Captura de coordinaciones en chat']].forEach(([k, l]) => add(3, 'Evidencias', l, () => has(`ev.${k}.file`), 'main'));
+  [['cal', 'Captura de Google Calendar'], ['meet', 'Captura de Meet con cámaras activadas'], ['chat', 'Captura de coordinaciones en chat']].forEach(([k, l]) => add(3, 'Evidencias', l, () => !!fileOf(`ev.${k}.file`), 'main'));
   STUDENTS.forEach((s) => add(3, 'Bitácora reflexiva', `${short(s)}: positivo y negativo`, () => inRange(`s${s.n}.bit.pos`, RANGES.bit) && inRange(`s${s.n}.bit.neg`, RANGES.bit), 'main'));
   STUDENTS.forEach((s) => add(4, 'Conclusiones', `${short(s)}: conclusión (3–4 líneas)`, () => inRange(`s${s.n}.concl`, RANGES.concl), 'main'));
-  STUDENTS.forEach((s) => add(5, 'Autoría', `${short(s)}: foto, carrera y lugar de nacimiento`, () => has(`s${s.n}.foto.file`) && has(`s${s.n}.carrera`) && has(`s${s.n}.nacimiento`), 'main'));
+  STUDENTS.forEach((s) => add(5, 'Autoría', `${short(s)}: foto, carrera y lugar de nacimiento`, () => !!fileOf(`s${s.n}.foto.file`) && has(`s${s.n}.carrera`) && has(`s${s.n}.nacimiento`), 'main'));
   add(5, 'Autoría', 'Symbaloo (PLE) incrustado con iframe', () => symbalooSrc(get('symbaloo.url')).embeddable, 'main');
   add(5, 'Autoría', 'Categoría «Producción académica» confirmada', () => get('symbaloo.cat') === '1', 'main', 'symbaloo.cat');
   add(0, 'Antes de entregar', 'Probar el enlace público desde otra cuenta o ventana', () => get('chk.publico') === '1', 'main', 'chk.publico');
@@ -354,11 +366,11 @@ function renderChecklist() {
 
 /* ================= Footer ================= */
 function renderFooter() {
-  const key = get('license') || 'by', [code, name] = LICENSES[key] || LICENSES.by;
+  const raw = String(get('license') || ''), key = Object.hasOwn(LICENSES, raw) ? raw : 'by', [code, name] = LICENSES[key];
   const url = `https://creativecommons.org/licenses/${key}/4.0/deed.es`;
   document.getElementById('site-footer').innerHTML = `
     <a href="${url}" target="_blank" rel="noopener noreferrer"><img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/${key}.svg" alt="${esc(code)}" height="31"></a>
-    <span>Este sitio web está bajo una licencia <a href="${url}" target="_blank" rel="noopener noreferrer">${esc(code)} · ${esc(name)}</a>.<br>Última actualización: <time datetime="${updated()}">${new Date(updated() + 'T12:00:00').toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' })}</time></span>
+    <span>Este sitio web está bajo una licencia <a href="${url}" target="_blank" rel="noopener noreferrer">${esc(code)} · ${esc(name)}</a>.<br>Última actualización: <time datetime="${esc(updated())}">${new Date(updated() + 'T12:00:00').toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' })}</time></span>
     <span class="edit-only" style="margin-left:auto;display:${document.body.classList.contains('editing') ? 'block' : 'none'}"><label for="f-license" style="font-size:.78rem">Licencia </label><select id="f-license" data-id="license" style="width:auto">${Object.entries(LICENSES).map(([k, v]) => `<option value="${k}" ${k === key ? 'selected' : ''}>${v[0]}</option>`).join('')}</select></span>`;
 }
 
@@ -384,6 +396,7 @@ function show(n) {
   current = n;
 }
 async function route() {
+  if (!/#\/\d/.test(location.hash)) return;
   const n = Math.min(5, Math.max(1, parseInt((location.hash.match(/#\/(\d)/) || [])[1] || '1', 10)));
   if (n === current) return;
   document.getElementById('nav').classList.remove('open');
@@ -404,7 +417,7 @@ function init() {
     if (t.dataset.id) { set(t.dataset.id, t.value); }
     else if (t.dataset.bool) { set(t.dataset.bool, t.checked ? '1' : ''); }
     else return;
-    refreshViews(); renderChecklist(); renderFooter();
+    syncInputs(); refreshViews(); renderChecklist(); renderFooter();
   };
   pages.addEventListener('input', onField); pages.addEventListener('change', onField);
   document.getElementById('site-footer').addEventListener('change', onField);
@@ -424,15 +437,17 @@ function init() {
   });
 
   // Checklist
-  document.getElementById('checklist').addEventListener('click', (e) => {
+  document.getElementById('checklist')?.addEventListener('click', (e) => {
     const b = e.target.closest('button.it'); if (!b) return;
-    if (b.dataset.manual) { set(b.dataset.manual, get(b.dataset.manual) === '1' ? '' : '1'); renderChecklist(); refreshViews(); return; }
+    if (b.dataset.manual) { set(b.dataset.manual, get(b.dataset.manual) === '1' ? '' : '1'); syncInputs(); renderChecklist(); refreshViews(); return; }
     const p = +b.dataset.page; if (p && p !== current) location.hash = `#/${p}`;
     setTimeout(() => (document.getElementById(b.dataset.go) || document.getElementById('main')).scrollIntoView({ behavior: 'smooth', block: 'center' }), p && p !== current ? 1700 : 50);
   });
   const clToggle = document.getElementById('cl-toggle'), cl = document.getElementById('checklist');
-  clToggle.addEventListener('click', () => { const c = cl.classList.toggle('closed'); clToggle.setAttribute('aria-expanded', String(!c)); });
-  if (matchMedia('(max-width:1279px)').matches) { cl.classList.add('closed'); clToggle.setAttribute('aria-expanded', 'false'); }
+  if (clToggle && cl) {
+    clToggle.addEventListener('click', () => { const c = cl.classList.toggle('closed'); clToggle.setAttribute('aria-expanded', String(!c)); });
+    if (matchMedia('(max-width:1279px)').matches) { cl.classList.add('closed'); clToggle.setAttribute('aria-expanded', 'false'); }
+  }
 
   // Tema
   const th = document.getElementById('btn-theme');
@@ -449,9 +464,16 @@ function init() {
     toast('Descarga lista: incluye textos y fotos de todo el equipo.');
   });
   document.getElementById('file-import').addEventListener('change', async (e) => {
-    try { C.importFlat((JSON.parse(await e.target.files[0].text())).fields); toast('Aportes importados y compartidos con el equipo.'); }
-    catch { toast('Ese archivo no es un aporte válido.'); }
+    try {
+      const j = JSON.parse(await e.target.files[0].text());
+      const r = C.prepareImport(j && typeof j === 'object' ? j.fields : null);
+      if (!r.count) toast('Ese archivo no tiene aportes válidos.');
+      else if (confirm(`Se importarán ${r.count} campos del archivo (exportado el ${String(j.exported || '').slice(0, 10) || 'fecha desconocida'}).\nEsto SOBRESCRIBE lo que hay ahora para el equipo en esos campos y se comparte con todos.\n\nÚsalo solo para restaurar tus propios datos o una copia completa. ¿Continuar?`)) { r.apply(); toast(`${r.count} campos importados.`); }
+    } catch { toast('Ese archivo no es un aporte válido.'); }
     e.target.value = ''; syncInputs(); refreshViews(); renderChecklist(); renderFooter(); applyLogo();
+  });
+  document.getElementById('btn-leave')?.addEventListener('click', () => {
+    if (confirm('¿Salir de la sala del equipo en este navegador? Tu copia local se conserva y podrás volver con el enlace del equipo.')) { try { localStorage.removeItem('pa2.room'); } catch {} location.href = location.pathname; }
   });
   document.getElementById('btn-share').addEventListener('click', async () => {
     const url = `${location.origin}${location.pathname}#sala=${ROOM}`;
@@ -479,10 +501,10 @@ function init() {
   initScene(document.getElementById('scene'), document.getElementById('hero'), { reduced });
   const start = Math.min(5, Math.max(1, parseInt((location.hash.match(/#\/(\d)/) || [])[1] || '1', 10)));
   show(start);
-  if (COLLAB) { eb.click(); if (!ME) askWho(); }
+  if (COLLAB && CONFIG.EDIT_BUTTON) { eb.click(); if (!ME) askWho(); }
 }
 function applyLogo() {
-  const el = document.getElementById('brand-logo'), src = get('logo.file');
+  const el = document.getElementById('brand-logo'), src = fileOf('logo.file');
   el.innerHTML = src ? `<img src="${esc(src)}" alt="Logotipo del equipo Nexus">` : 'LOGO';
 }
 
@@ -498,12 +520,14 @@ function syncInputs() {
   });
   document.querySelectorAll('[data-bool]').forEach((el) => { el.checked = get(el.dataset.bool) === '1'; });
 }
+let saveFailed = false;
 function wireCollab() {
   const st = document.getElementById('sync-status'), pr = document.getElementById('presence');
   C.on('change', (origin) => { if (origin === 'remote' || origin === 'load') { syncInputs(); refreshViews(); renderChecklist(); renderFooter(); applyLogo(); } });
-  C.on('status', ({ state, peers }) => {
+  C.on('status', ({ state, peers, saveFailed: sf }) => {
+    saveFailed = !!sf;
     st.dataset.state = state === 'off' ? 'off' : peers ? 'live' : 'wait';
-    st.textContent = state === 'off' ? 'Sin conexión: tus cambios quedan en este navegador' : peers ? `Sincronizado en tiempo real con ${peers} ${peers === 1 ? 'persona' : 'personas'}` : 'Buscando compañeros en línea… (tus cambios se guardan aquí y se fusionan al coincidir)';
+    st.textContent = saveFailed ? '⚠ No se pudo guardar en este navegador: descarga los aportes' : state === 'off' ? 'Sin conexión: tus cambios quedan en este navegador' : peers ? `Sincronizado en tiempo real con ${peers} ${peers === 1 ? 'persona' : 'personas'}` : 'Buscando compañeros en línea… (tus cambios se guardan aquí y se fusionan al coincidir)';
   });
   C.on('presence', (list) => {
     const on = list.filter((p) => p.name);
@@ -514,6 +538,7 @@ function wireCollab() {
   document.addEventListener('focusin', (e) => { const id = e.target.dataset?.id; if (id) C.setMe({ focus: id }); });
   document.addEventListener('focusout', (e) => { if (e.target.dataset?.id) C.setMe({ focus: '' }); });
   C.setMe({ name: ME || 'Invitado' });
+  C.refreshStatus();
 }
 function askWho() {
   const d = document.createElement('div'); d.className = 'who';
@@ -524,7 +549,7 @@ function askWho() {
 }
 
 (async () => {
-  if (COLLAB) { await C.start(ROOM); }
+  if (COLLAB) { try { await C.start(ROOM); } catch (e) { console.error('colaboración', e); } }
   else { try { const r = await fetch('content.json', { cache: 'no-cache' }); if (r.ok) base = (await r.json()).fields || {}; } catch {} }
-  init();
+  try { init(); } catch (e) { console.error('init', e); document.getElementById('pages').innerHTML = '<p class="pending">No se pudo mostrar el sitio. Recarga la página.</p>'; }
 })();
