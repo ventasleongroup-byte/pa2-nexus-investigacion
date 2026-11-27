@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arquitectura del sitio · Equipo Nexus</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+.map{display:grid;grid-template-columns:1fr 1.5fr 1fr 1fr;gap:14px;margin-top:22px;align-items:center;position:relative}
+@media (max-width:760px){.map{grid-template-columns:1fr}}
+.n{position:relative;text-align:left;font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s;animation:up .55s ease both}
+@keyframes up{from{opacity:0;transform:translateY(14px)}}
+.n:hover,.n.on{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 10px 24px rgba(255,138,31,.14)}
+.n .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber2)}
+.n .t{font-weight:800;margin-top:3px;font-size:15px}
+.n:not(.sub):not(:last-child)::after{content:"→";position:absolute;right:-14px;top:50%;transform:translateY(-50%);color:var(--amber);font-size:14px;width:14px;text-align:center}
+@media (max-width:760px){.n:not(.sub):not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-16px;transform:translateX(-50%)}}
+.subs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.sub{padding:9px 10px;border-radius:10px;font-size:13px;background:#0f0c08}
+.sub .t{font-size:13px;margin-top:0}
+.sub .k{display:none}
+.box{animation:up .55s ease both}
+.info{margin-top:18px;min-height:64px;font-size:14px}
+.info b{color:var(--amber2)}
+.go{margin-left:10px;font-size:12.5px;padding:.3em .9em}
+.off{display:none}
+</style></head><body>
+<span class="tag">Presentación · Arquitectura del sitio</span>
+<h1>Cómo está <em>organizado</em> este sitio</h1>
+<p class="lead">Cuatro bloques en orden de lectura. Toca cualquiera para saber qué encontrarás y ve directo a esa página.</p>
+<div class="map" id="mp"></div>
+<div class="panel info" id="if" aria-live="polite"></div>
+<script>
+/* ===== EDIT HERE: page addresses (Google Sites) and descriptions ===== */
+var N=[
+ {k:"1",t:"Presentación",d:"El problema que investigamos, por qué importa en las MYPES y cómo está organizado el sitio.",url:""},
+ {k:"2",t:"Contenido académico",d:"Cuatro subpáginas, una por integrante: control interno, herramientas digitales, clasificación ABC y niveles mínimo y máximo.",url:"",
+  subs:[["Natali","Control interno"],["Franluis","Herramientas digitales"],["Fabio","Clasificación ABC"],["Marghiory","Mín/máx y hojas compartidas"]]},
+ {k:"3",t:"Conclusiones",d:"Las ideas que se desprenden de las cuatro miradas.",url:""},
+ {k:"4",t:"Autoría",d:"Quiénes somos, qué hizo cada integrante y la licencia del sitio.",url:""}];
+/* ===================================================================== */
+var mp=document.getElementById('mp'),inf=document.getElementById('if'),B=[];
+N.forEach(function(n,i){var b=document.createElement('button');b.type='button';b.className='n';b.style.animationDelay=(i*.15)+'s';
+ b.innerHTML='<div class="k">Página '+n.k+'</div><div class="t">'+n.t+'</div>'+(n.subs?'<div class="subs">'+n.subs.map(function(s){return'<div class="sub"><div class="t">'+s[0]+'</div><div style="color:var(--mut);font-size:11.5px">'+s[1]+'</div></div>'}).join('')+'</div>':'');
+ b.onclick=function(){show(i)};mp.appendChild(b);B.push(b)});
+function show(i){B.forEach(function(b,k){b.classList.toggle('on',k===i)});var n=N[i];
+ inf.innerHTML='<b>'+n.t+'.</b> '+n.d+(n.url?' <a class="btn go" href="'+n.url+'" target="_top">Ir a esta página →</a>':'');}
+show(0);
+</script></body></html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El recorrido del inventario · Equipo Nexus</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:20px;position:relative}
+@media (max-width:760px){.flow{grid-template-columns:1fr}}
+.s{position:relative;text-align:left;font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 12px;cursor:pointer;transition:transform .3s,border-color .3s,box-shadow .3s,background .3s}
+.s svg{width:34px;height:34px;stroke:var(--mut);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke .3s}
+.s .n{margin-top:8px;font-weight:800;font-size:14.5px}
+.s .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.s.on{transform:translateY(-5px);border-color:var(--amber);background:#1d1610;box-shadow:0 10px 24px rgba(255,138,31,.16)}
+.s.on svg{stroke:var(--amber)}
+.s:not(:last-child)::after{content:"";position:absolute;right:-10px;top:50%;width:10px;height:2px;background:var(--line)}
+@media (max-width:760px){.s:not(:last-child)::after{display:none}}
+.s.pass::after{background:var(--amber)!important}
+.belt{height:6px;border-radius:4px;margin-top:14px;background:repeating-linear-gradient(90deg,#2d241a 0 14px,#3a2e20 14px 28px);background-size:28px 6px;animation:mv 1s linear infinite}
+@keyframes mv{to{background-position:28px 0}}
+.det{margin-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media (max-width:760px){.det{grid-template-columns:1fr}}
+.det h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber2)}
+.det p{margin-top:.4em;font-size:14px}
+.det .bad h2{color:#eb9a8a}
+.ctl{display:flex;justify-content:flex-end;margin-top:8px}
+.ctl button{font-size:12.5px;padding:.3em .9em}
+</style></head><body>
+<span class="tag">El problema · Ciclo del inventario</span>
+<h1>Cinco pasos por donde se <em>pierde o se gana</em> control</h1>
+<p class="lead">Toda mercadería recorre las mismas etapas. Toca una para ver qué se registra, dónde suele fallar en una MYPE y qué herramienta ayuda.</p>
+<div class="flow" id="fl"></div>
+<div class="belt" aria-hidden="true"></div>
+<div class="panel det" id="dt" style="margin-top:14px" aria-live="polite"></div>
+<div class="ctl"><button class="ghost" id="pp">⏸ Pausar recorrido</button></div>
+<script>
+/* Generic explanatory text; replace with the team's own wording if wanted. */
+var S=[
+{n:"Recepción",ic:'<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+ reg:"Qué llegó, cuánto y en qué estado, comparado con la factura o guía.",fal:"Se recibe sin contar ni revisar, y el error entra al sistema desde el primer día.",her:"Hoja de recepción con lista de verificación; lector de códigos si hay volumen."},
+{n:"Almacenamiento",ic:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
+ reg:"En qué ubicación quedó cada producto.",fal:"Productos sin lugar fijo: se buscan, se mezclan o se pierden.",her:"Códigos de ubicación (pasillo, estante, nivel) anotados en la hoja o el sistema."},
+{n:"Control del stock",ic:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+ reg:"Saldos actualizados y niveles mínimo y máximo.",fal:"El saldo del registro no coincide con el estante y nadie se entera hasta que falta algo.",her:"Conteos cíclicos, clasificación ABC y alertas de stock mínimo."},
+{n:"Preparación",ic:'<path d="M6 6h15l-2 9H8z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>',
+ reg:"Qué se saca para cada pedido.",fal:"Se despacha de memoria y se olvida descontar del registro.",her:"Descuento automático al registrar la venta en una hoja compartida o un software."},
+{n:"Despacho",ic:'<rect x="1" y="7" width="14" height="10" rx="1"/><path d="M15 10h4l3 3v4h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+ reg:"Qué salió, cuándo y hacia quién.",fal:"Sin constancia de salida, no se puede reclamar ni reponer a tiempo.",her:"Guía o nota de salida digital y reporte de movimientos."}];
+var fl=document.getElementById('fl'),dt=document.getElementById('dt'),cur=0,auto=true,tm=null,B=[];
+S.forEach(function(s,i){var b=document.createElement('button');b.type='button';b.className='s';
+ b.innerHTML='<div class="k">Paso '+(i+1)+'</div><svg viewBox="0 0 24 24" aria-hidden="true">'+s.ic+'</svg><div class="n">'+s.n+'</div>';
+ b.onclick=function(){auto=false;pp.textContent='▶ Reanudar recorrido';stop();go(i)};fl.appendChild(b);B.push(b)});
+function go(i){cur=i;B.forEach(function(b,k){b.classList.toggle('on',k===i);b.classList.toggle('pass',k<i);b.setAttribute('aria-pressed',k===i)});
+ var s=S[i];dt.innerHTML='<div><h2>Qué se registra</h2><p>'+s.reg+'</p></div><div class="bad"><h2>Dónde suele fallar</h2><p>'+s.fal+'</p></div><div><h2>Qué ayuda</h2><p>'+s.her+'</p></div>'}
+function stop(){clearInterval(tm)}
+function start(){stop();tm=setInterval(function(){go((cur+1)%S.length)},2600)}
+var pp=document.getElementById('pp');
+pp.onclick=function(){auto=!auto;pp.textContent=auto?'⏸ Pausar recorrido':'▶ Reanudar recorrido';auto?start():stop()};
+go(0);start();
+</script></body></html>

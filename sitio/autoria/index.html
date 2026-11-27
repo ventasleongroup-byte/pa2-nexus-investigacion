@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Autoría · Equipo Nexus</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px;perspective:900px}
+@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:460px){.grid{grid-template-columns:1fr}}
+.m{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 14px 16px;text-align:center;transition:transform .15s ease-out,border-color .25s,box-shadow .25s;transform-style:preserve-3d;animation:up .6s ease both}
+@keyframes up{from{opacity:0;transform:translateY(16px)}}
+.m:hover{border-color:var(--amber);box-shadow:0 14px 30px rgba(255,138,31,.15)}
+.av{width:92px;height:92px;margin:0 auto;border-radius:50%;padding:3px;background:conic-gradient(from 200deg,var(--amber),var(--amber2),#7a3d0a,var(--amber));position:relative;transform:translateZ(30px)}
+.av>div{width:100%;height:100%;border-radius:50%;background:#1d1610 center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:var(--amber2);letter-spacing:.04em}
+.nm{margin-top:14px;font-weight:800;font-size:16px}
+.ap{font-size:12.5px;color:var(--mut);margin-top:2px}
+.rl{display:inline-block;margin-top:10px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber2);border:1px solid #ff8a1f55;border-radius:999px;padding:3px 10px}
+.rl.ph{opacity:.5}
+.st{margin-top:10px;font-size:12.5px;color:var(--cream)}
+.lk{margin-top:12px;font-size:12.5px;color:var(--amber2);text-decoration:none;border-bottom:1px solid #ff8a1f66}
+.lk:hover{color:#fff}
+.meta{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:center;font-size:12.5px;color:var(--mut);border-top:1px solid var(--line);padding-top:14px}
+.meta b{color:var(--cream);font-weight:600}
+</style></head><body>
+<span class="tag">Autoría</span>
+<h1>Equipo <em>Nexus</em></h1>
+<p class="lead" id="ld"></p>
+<div class="grid" id="g"></div>
+<div class="meta" id="mt"></div>
+<script>
+/* ===== EDIT HERE: roles, photos and subpage links ===== */
+var DATA={
+  intro:"Cuatro estudiantes, una investigación: cómo las MYPES pueden ordenar su inventario con herramientas digitales.",
+  integrantes:[
+    {nombre:"Natali Daniela",apellidos:"Lazo Llamoca",rol:"",subtema:"Control interno y confiabilidad de los registros",foto:"",url:""},
+    {nombre:"Franluis Eduardo",apellidos:"León Sovero",rol:"Coordinador",subtema:"Herramientas digitales aplicadas a inventarios",foto:"",url:""},
+    {nombre:"Fabio",apellidos:"Vasquez Segura",rol:"",subtema:"Clasificación ABC y control de existencias",foto:"",url:""},
+    {nombre:"Marghiory Maricielo",apellidos:"Villegas Márquez",rol:"",subtema:"Primeros pasos digitales: hojas compartidas y mín/máx",foto:"",url:""}
+  ],
+  meta:[["Curso","Herramientas virtuales para el aprendizaje"],["Periodo","2026-2"],["Equipo","Nexus"]],
+  licencia:"" /* paste the Creative Commons text here */
+};
+/* ===================================================== */
+var g=document.getElementById('g');
+document.getElementById('ld').textContent=DATA.intro;
+DATA.integrantes.forEach(function(p,i){
+ var ini=(p.nombre[0]+p.apellidos[0]).toUpperCase(),m=document.createElement('article');m.className='m';m.style.animationDelay=(i*.12)+'s';
+ m.innerHTML='<div class="av"><div'+(p.foto?' style="background-image:url('+p.foto+')"':'')+'>'+(p.foto?'':ini)+'</div></div>'+
+  '<div class="nm">'+p.nombre+'</div><div class="ap">'+p.apellidos+'</div>'+
+  '<span class="rl'+(p.rol?'':' ph')+'">'+(p.rol||'Rol por definir')+'</span>'+
+  '<div class="st">'+p.subtema+'</div>'+(p.url?'<a class="lk" href="'+p.url+'" target="_top">Ver su contenido →</a>':'');
+ m.addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;var r=m.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;m.style.transform='rotateY('+(x*10)+'deg) rotateX('+(-y*10)+'deg)'});
+ m.addEventListener('pointerleave',function(){m.style.transform=''});
+ g.appendChild(m)});
+document.getElementById('mt').innerHTML=DATA.meta.map(function(x){return'<span>'+x[0]+': <b>'+x[1]+'</b></span>'}).join('')+(DATA.licencia?'<span>'+DATA.licencia+'</span>':'');
+</script></body></html>

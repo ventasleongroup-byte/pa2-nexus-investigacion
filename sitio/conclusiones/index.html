@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conclusiones · Equipo Nexus</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+.row{position:relative;display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:14px;margin-top:26px}
+@media (max-width:760px){.row{grid-template-columns:1fr}}
+.row::before{content:"";position:absolute;left:4%;right:4%;top:-12px;height:2px;background:linear-gradient(90deg,var(--amber),var(--amber2));transform-origin:left;transform:scaleX(0);transition:transform 1.2s ease}
+.row.go::before{transform:scaleX(1)}
+@media (max-width:760px){.row::before{display:none}}
+.k{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 16px 16px;opacity:0;transform:translateY(18px) scale(.98);transition:opacity .6s ease,transform .6s ease,border-color .25s}
+.k.on{opacity:1;transform:none}
+.k:hover{border-color:var(--amber)}
+.k .no{position:absolute;right:12px;top:4px;font-size:54px;font-weight:800;color:#ff8a1f1c;line-height:1}
+.k .dot{position:absolute;left:18px;top:-18px;width:12px;height:12px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 5px #ff8a1f30,0 0 14px var(--amber)}
+@media (max-width:760px){.k .dot{display:none}}
+.k h2{font-size:16px;color:var(--amber2);padding-right:36px}
+.k p{margin-top:.55em;font-size:14px;color:var(--cream)}
+.k.ph p,.k.ph h2{opacity:.55}
+.fin{margin-top:18px;text-align:center;font-size:clamp(15px,2.4vw,20px);font-weight:700;opacity:0;transition:opacity .8s ease .2s}
+.fin.on{opacity:1}.fin em{font-style:normal;color:var(--amber)}
+.rp{position:absolute;right:6px;top:4px;width:28px;height:28px;border-radius:50%;padding:0;background:transparent;border:1px solid #ffffff40;color:#fff;opacity:.5;font-size:14px}
+.rp:hover{opacity:1}
+</style></head><body>
+<button class="rp" id="rp" aria-label="Repetir animación" title="Repetir">↻</button>
+<span class="tag">Conclusiones</span>
+<h1 id="tt"></h1>
+<div class="row" id="row"></div>
+<p class="fin" id="fin"></p>
+<script>
+/* ===== EDIT HERE: final texts go in this block only ===== */
+var DATA={
+  titulo:"Lo que <em>aprendimos</em>",
+  conclusiones:[
+    {t:"[Título de la conclusión 1]",x:"[Texto de la conclusión 1: una o dos frases con la idea principal y la evidencia que la respalda.]"},
+    {t:"[Título de la conclusión 2]",x:"[Texto de la conclusión 2.]"},
+    {t:"[Título de la conclusión 3]",x:"[Texto de la conclusión 3.]"}
+  ],
+  cierre:"" /* optional closing sentence, e.g. "Ordenar primero, digitalizar después." Use <em> to highlight. */
+};
+/* ======================================================= */
+var $=function(i){return document.getElementById(i)},row=$('row'),T=[];
+$('tt').innerHTML=DATA.titulo;
+row.style.setProperty('--n',Math.min(DATA.conclusiones.length,4));
+DATA.conclusiones.forEach(function(c,i){var k=document.createElement('article');
+ k.className='k'+(/^\[/.test(c.t)?' ph':'');
+ k.innerHTML='<span class="dot"></span><span class="no">'+(i+1)+'</span><h2>'+c.t+'</h2><p>'+c.x+'</p>';row.appendChild(k)});
+if(DATA.cierre)$('fin').innerHTML=DATA.cierre;
+function play(){T.forEach(clearTimeout);T=[];row.classList.remove('go');$('fin').classList.remove('on');
+ [].forEach.call(row.children,function(k){k.classList.remove('on')});
+ T.push(setTimeout(function(){row.classList.add('go')},120));
+ [].forEach.call(row.children,function(k,i){T.push(setTimeout(function(){k.classList.add('on')},500+i*550))});
+ T.push(setTimeout(function(){$('fin').classList.add('on')},500+row.children.length*550))}
+$('rp').onclick=play;play();
+</script></body></html>
