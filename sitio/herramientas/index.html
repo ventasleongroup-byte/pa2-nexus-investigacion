@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Del cuaderno a la nube · Herramientas digitales</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+.f{margin-top:16px}.f label{display:flex;justify-content:space-between;font-size:14px}.f b{color:var(--amber2)}
+.track{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px;position:relative}
+@media (max-width:700px){.track{grid-template-columns:1fr}}
+.st{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;text-align:left;font:inherit;color:inherit;transition:transform .25s,border-color .25s,background .25s,opacity .25s;opacity:.55}
+.st .ic{font-size:22px}.st .n{font-weight:800;margin-top:4px;font-size:14px}.st .p{font-size:12px;color:var(--mut);margin-top:2px}
+.st.rec{opacity:1;border-color:var(--amber);background:#1d1610;transform:translateY(-4px)}
+.st.rec::after{content:"Recomendada para este tamaño";display:block;margin-top:8px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber2)}
+.st[aria-pressed=true]{border-color:var(--amber2);opacity:1}
+.det{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){.det{grid-template-columns:1fr}}
+.det h2{font-size:17px;color:var(--amber2)}
+.det ul{margin:.4em 0 0 1.1em;font-size:13.5px}
+.det li{margin:.25em 0}
+.pro li::marker{color:var(--ok)}.con li::marker{color:var(--bad)}
+.meter{display:flex;gap:4px;margin-top:6px;align-items:center;font-size:12px;color:var(--mut)}
+.meter i{width:18px;height:7px;border-radius:2px;background:#2d241a}.meter i.on{background:var(--amber)}
+</style></head><body>
+<span class="tag">Franluis · Herramientas digitales</span>
+<h1>Del cuaderno a la <em>nube</em></h1>
+<p class="lead">No hay una herramienta ideal para todos. Indica cuántos productos distintos maneja la MYPE y mira cuál conviene; toca cada etapa para ver sus ventajas y límites.</p>
+<div class="f panel"><label for="sk">Productos distintos que maneja <b id="skv"></b></label><input id="sk" type="range" min="10" max="2000" step="10" value="150"></div>
+<div class="track" id="tr"></div>
+<div class="panel det" id="dt" style="margin-top:12px" aria-live="polite"></div>
+<p class="note">Los rangos de tamaño son orientativos y didácticos; cada negocio debe validarlos según sus ventas, personal y presupuesto.</p>
+<script>
+var T=[
+{ic:"📒",n:"Cuaderno",p:"Hasta ~30 productos",max:30,cost:1,ease:3,
+ pro:["Cero costo y cero aprendizaje","Sirve para empezar a registrar"],con:["Errores de copia y letra ilegible","No se puede compartir ni buscar rápido","Sin alertas de reposición"]},
+{ic:"📊",n:"Hoja de cálculo",p:"~30 a 300",max:300,cost:1,ease:3,
+ pro:["Gratis o muy barata","Fórmulas para stock mínimo y ABC","Flexible, la mayoría ya la sabe usar"],con:["Un archivo, una sola persona a la vez","Se rompe con fórmulas mal copiadas"]},
+{ic:"☁️",n:"Hoja en la nube",p:"~300 a 800",max:800,cost:1,ease:3,
+ pro:["Varias personas editan a la vez","Historial de cambios y copias automáticas","Acceso desde el celular"],con:["Requiere disciplina de quién anota qué","Sigue siendo manual: nada avisa solo"]},
+{ic:"🧮",n:"Software de inventario",p:"~800 a 1 500",max:1500,cost:2,ease:2,
+ pro:["Kardex automático y alertas de stock","Integra compras, ventas y reportes","Reduce errores humanos"],con:["Costo mensual o de licencia","Hay que capacitar al personal y migrar datos"]},
+{ic:"📡",n:"RFID / IoT",p:"Más de ~1 500",max:1e9,cost:3,ease:1,
+ pro:["Lectura masiva sin escanear uno por uno","Conteos rápidos y trazabilidad"],con:["Inversión alta en etiquetas y lectores","Solo se justifica con mucho volumen o valor"]}];
+var tr=document.getElementById('tr'),dt=document.getElementById('dt'),sk=document.getElementById('sk'),sel=0;
+T.forEach(function(s,i){var b=document.createElement('button');b.type='button';b.className='st';b.setAttribute('aria-pressed','false');
+ b.innerHTML='<div class="ic" aria-hidden="true">'+s.ic+'</div><div class="n">'+s.n+'</div><div class="p">'+s.p+'</div>';
+ b.onclick=function(){sel=i;ren()};tr.appendChild(b)});
+function meter(n){var h='';for(var k=1;k<=3;k++)h+='<i class="'+(k<=n?'on':'')+'"></i>';return h}
+function ren(){
+ var v=+sk.value,rec=T.findIndex(function(s){return v<=s.max});
+ document.getElementById('skv').textContent=v+' productos';
+ for(var i=0;i<T.length;i++){var c=tr.children[i];c.classList.toggle('rec',i===rec);c.setAttribute('aria-pressed',i===sel?'true':'false')}
+ var s=T[sel];
+ dt.innerHTML='<div><span class="tag">'+s.n+'</span><h2>Ventajas</h2><ul class="pro">'+s.pro.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul></div>'+
+ '<div><h2 style="color:#e9b0a0">Límites</h2><ul class="con">'+s.con.map(function(x){return'<li>'+x+'</li>'}).join('')+'</ul>'+
+ '<div class="meter">Costo <span style="display:flex;gap:4px">'+meter(s.cost)+'</span>&nbsp;&nbsp;Facilidad <span style="display:flex;gap:4px">'+meter(s.ease)+'</span></div></div>';
+}
+sk.oninput=function(){var r=T.findIndex(function(s){return +sk.value<=s.max});sel=r;ren()};
+sel=T.findIndex(function(s){return +sk.value<=s.max});ren();
+</script></body></html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registro vs. conteo físico</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);text-align:left;padding:6px}
+td{padding:6px;border-top:1px solid var(--line)}
+td input{max-width:92px}
+.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
+.res{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.res div{flex:1 1 140px;background:#0f0c08;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--mut)}
+.res b{display:block;font-size:26px;color:var(--amber2)}
+.gauge{height:10px;border-radius:6px;background:#2d241a;margin-top:6px;overflow:hidden}
+.gauge i{display:block;height:100%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--ok));transition:width .4s}
+#msg{margin-top:12px;font-size:14px}
+</style></head><body>
+<span class="tag">Natali · Control interno</span>
+<h1>¿Lo que dice el sistema <em>coincide</em> con el estante?</h1>
+<p class="lead">Compara el saldo del registro con el conteo físico. Edita las cantidades contadas y mira cómo cae la exactitud del inventario cuando los registros no son confiables.</p>
+<div class="panel" style="margin-top:16px;overflow-x:auto">
+<table><thead><tr><th>Producto</th><th>Registro</th><th>Conteo físico</th><th>Diferencia</th></tr></thead><tbody id="tb"></tbody></table>
+<div class="res"><div>Exactitud del registro<b id="acc"></b><div class="gauge"><i id="g"></i></div></div><div>Productos con diferencia<b id="nd"></b></div><div>Unidades en diferencia<b id="ud"></b></div></div>
+<p id="msg"></p>
+<button class="ghost" id="rs" style="margin-top:10px;font-size:13px">Restablecer</button>
+</div>
+<p class="note">Ejemplo ilustrativo con datos inventados. La exactitud aquí se calcula como productos sin diferencia ÷ productos contados.</p>
+<script>
+var base=[["Aceite 1 L",48,46],["Arroz 50 kg",20,20],["Azúcar 50 kg",15,15],["Fideos",120,112],["Atún lata",200,200],["Galletas",75,75],["Sal",60,60],["Detergente",40,33]];
+var d=[],$=function(i){return document.getElementById(i)};
+function build(){d=base.map(function(x){return x.slice()});var tb=$('tb');tb.innerHTML='';
+ d.forEach(function(r,i){var tr=document.createElement('tr');
+  tr.innerHTML='<td>'+r[0]+'</td><td>'+r[1]+'</td><td><input type="number" min="0" value="'+r[2]+'" aria-label="Conteo de '+r[0]+'"></td><td id="df'+i+'"></td>';
+  tr.querySelector('input').oninput=function(e){d[i][2]=Math.max(0,+e.target.value||0);calc()};tb.appendChild(tr)});calc()}
+function calc(){var nd=0,ud=0;
+ d.forEach(function(r,i){var x=r[2]-r[1],c=$('df'+i);c.textContent=x===0?'✓ coincide':(x>0?'+':'')+x;c.className=x===0?'ok':'bad';if(x!==0){nd++;ud+=Math.abs(x)}});
+ var a=Math.round((d.length-nd)/d.length*100);
+ $('acc').textContent=a+' %';$('g').style.width=a+'%';$('nd').textContent=nd+' de '+d.length;$('ud').textContent=ud;
+ $('msg').textContent=a>=95?'Registro confiable: se puede analizar y reponer con estos datos.':a>=80?'Hay diferencias. Conviene investigar la causa (errores de anotación, mermas, entradas sin registrar) y hacer conteos cíclicos.':'Registro poco confiable: cualquier decisión de compra basada en estos saldos tiene riesgo. Primero ordena el control, después digitaliza.'}
+$('rs').onclick=build;build();
+</script></body></html>

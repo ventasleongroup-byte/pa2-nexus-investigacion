@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Clasificación ABC interactiva</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+.wrap{display:grid;grid-template-columns:230px 1fr;gap:16px;margin-top:16px}
+@media (max-width:700px){.wrap{grid-template-columns:1fr}}
+.row{display:grid;grid-template-columns:1fr 84px;gap:8px;align-items:center;margin:6px 0}
+.row span{font-size:13px}
+svg{width:100%;height:auto;display:block}
+.A{fill:#ff8a1f}.B{fill:#ffc266}.C{fill:#8c7a63}
+.leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--mut)}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+#msg{margin-top:10px;font-size:13.5px}
+.bar{cursor:pointer;transition:opacity .2s}.bar:hover{opacity:.8}
+</style></head><body>
+<span class="tag">Fabio · Clasificación ABC</span>
+<h1>Pocos productos, <em>mucho valor</em></h1>
+<p class="lead">Cambia el valor anual de cada producto y mira cómo se reordena la clasificación. A: el 80 % del valor acumulado · B: hasta el 95 % · C: el resto.</p>
+<div class="wrap">
+ <div class="panel"><div class="tag" style="margin-bottom:6px">Valor anual (S/)</div><div id="in"></div>
+  <button class="ghost" id="rs" style="margin-top:10px;font-size:13px">Restablecer ejemplo</button></div>
+ <div class="panel"><svg id="ch" viewBox="0 0 560 290" role="img" aria-label="Gráfico de Pareto con clasificación ABC"></svg>
+  <div class="leg"><span><i style="background:#ff8a1f"></i>A · vigilar de cerca</span><span><i style="background:#ffc266"></i>B · control moderado</span><span><i style="background:#8c7a63"></i>C · control simple</span></div>
+  <p id="msg"></p></div>
+</div>
+<p class="note">Datos de ejemplo inventados para ilustrar el método, no corresponden a una empresa real.</p>
+<script>
+var base=[["Aceite 1 L",9200],["Arroz 50 kg",7400],["Azúcar 50 kg",3300],["Fideos",1600],["Atún lata",1200],["Galletas",800],["Sal",450],["Fósforos",250]];
+var data=[];function reset(){data=base.map(function(x){return[x[0],x[1]]});build();draw()}
+var ins=document.getElementById('in');
+function build(){ins.innerHTML='';data.forEach(function(r,i){var w=document.createElement('div');w.className='row';
+ w.innerHTML='<span>'+r[0]+'</span><input type="number" min="0" step="50" value="'+r[1]+'" aria-label="Valor de '+r[0]+'">';
+ w.querySelector('input').oninput=function(e){data[i][1]=Math.max(0,+e.target.value||0);draw()};ins.appendChild(w)})}
+function draw(){
+ var s=data.slice().sort(function(a,b){return b[1]-a[1]}),T=s.reduce(function(a,r){return a+r[1]},0)||1,acc=0,cl=[];
+ s.forEach(function(r){var prev=acc/T;acc+=r[1];cl.push(prev<0.8?'A':prev<0.95?'B':'C')});
+ var X0=36,Y0=250,W=500,H=210,bw=W/s.length,max=s[0][1]||1,sv='',pts=[];
+ [0,.5,.8,.95,1].forEach(function(g){var y=Y0-g*H;sv+='<line x1="'+X0+'" x2="'+(X0+W)+'" y1="'+y+'" y2="'+y+'" stroke="#2d241a"'+(g==.8||g==.95?' stroke-dasharray="4 4"':'')+'/><text x="30" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="#b9a68f">'+Math.round(g*100)+'%</text>'});
+ acc=0;
+ s.forEach(function(r,i){var h=r[1]/T*H,x=X0+i*bw+bw*.14;acc+=r[1];
+  sv+='<rect class="bar '+cl[i]+'" x="'+x+'" y="'+(Y0-h)+'" width="'+bw*.72+'" height="'+h+'" rx="3"><title>'+r[0]+': S/ '+r[1]+' ('+cl[i]+')</title></rect>';
+  sv+='<text x="'+(x+bw*.36)+'" y="'+(Y0+14)+'" text-anchor="middle" font-size="9.5" fill="#b9a68f">'+r[0].split(' ')[0]+'</text>';
+  pts.push((X0+i*bw+bw/2)+','+(Y0-acc/T*H))});
+ sv+='<polyline fill="none" stroke="#f3e6d3" stroke-width="2" points="'+pts.join(' ')+'"/>';
+ pts.forEach(function(p){var c=p.split(',');sv+='<circle cx="'+c[0]+'" cy="'+c[1]+'" r="3" fill="#f3e6d3"/>'});
+ document.getElementById('ch').innerHTML=sv;
+ var nA=cl.filter(function(c){return c=='A'}).length,vA=s.filter(function(r,i){return cl[i]=='A'}).reduce(function(a,r){return a+r[1]},0);
+ document.getElementById('msg').innerHTML='<b style="color:var(--amber2)">'+nA+' de '+s.length+' productos ('+Math.round(nA/s.length*100)+' %)</b> concentran el <b style="color:var(--amber2)">'+Math.round(vA/T*100)+' %</b> del valor. Ahí va el control más fino: conteos frecuentes y reposición cuidadosa.';
+}
+document.getElementById('rs').onclick=reset;reset();
+</script></body></html>

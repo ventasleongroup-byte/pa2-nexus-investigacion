@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulador de niveles mínimo y máximo</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+.wrap{display:grid;grid-template-columns:240px 1fr;gap:16px;margin-top:16px}
+@media (max-width:700px){.wrap{grid-template-columns:1fr}}
+.f{margin:10px 0}.f label{display:flex;justify-content:space-between}.f b{color:var(--amber2)}
+svg{width:100%;height:auto;display:block}
+.kp{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.kp div{flex:1 1 90px;background:#0f0c08;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--mut)}
+.kp b{display:block;font-size:20px;color:var(--amber2)}
+</style></head><body>
+<span class="tag">Marghiory · Niveles mínimo y máximo</span>
+<h1>¿Cuándo <em>reponer</em> y cuánto pedir?</h1>
+<p class="lead">Mueve los controles y mira cómo cambia el stock día a día. El pedido se hace cuando el stock toca el nivel mínimo y llega después del tiempo de entrega.</p>
+<div class="wrap">
+ <div class="panel">
+  <div class="f"><label>Venta diaria <b id="v1"></b></label><input id="dm" type="range" min="5" max="40" value="20"></div>
+  <div class="f"><label>Tiempo de entrega (días) <b id="v2"></b></label><input id="lt" type="range" min="1" max="10" value="4"></div>
+  <div class="f"><label>Stock de seguridad <b id="v3"></b></label><input id="ss" type="range" min="0" max="120" value="30"></div>
+  <div class="f"><label>Nivel máximo <b id="v4"></b></label><input id="mx" type="range" min="100" max="600" step="10" value="300"></div>
+  <button id="pl" style="margin-top:6px">▶ Animar</button>
+ </div>
+ <div class="panel"><svg id="ch" viewBox="0 0 560 280" role="img" aria-label="Evolución del stock con nivel mínimo y máximo"></svg>
+  <div class="kp"><div>Nivel mínimo (punto de pedido)<b id="kmin"></b></div><div>Cantidad a pedir<b id="kq"></b></div><div>Días sin stock<b id="kb"></b></div></div>
+  <p class="note" id="adv"></p></div>
+</div>
+<p class="note">Modelo simple y didáctico: mínimo = venta diaria × tiempo de entrega + stock de seguridad. La venta varía hasta ±25 % con un patrón fijo, para que el resultado sea repetible.</p>
+<script>
+var $=function(i){return document.getElementById(i)},DAYS=60,upto=DAYS,timer=null;
+function sim(){
+ var d=+$('dm').value,L=+$('lt').value,S=+$('ss').value,M=+$('mx').value,min=d*L+S,q=Math.max(0,M-min),st=M,arr=-1,out=[],brk=0;
+ for(var t=0;t<DAYS;t++){
+  if(t===arr){st+=q;arr=-1}
+  var dem=Math.round(d*(1+0.25*Math.sin(t*1.9+1)*Math.cos(t*.7)));
+  if(st<dem){brk++;st=0}else st-=dem;
+  if(arr<0&&st<=min&&q>0)arr=t+L;
+  out.push(st)}
+ return{out:out,min:min,q:q,brk:brk,M:M}}
+function draw(){
+ var r=sim(),X0=34,Y0=245,W=510,H=215,top=Math.max(r.M,Math.max.apply(null,r.out))*1.08,sv='';
+ var y=function(v){return Y0-v/top*H};
+ sv+='<line x1="'+X0+'" x2="'+(X0+W)+'" y1="'+y(r.M)+'" y2="'+y(r.M)+'" stroke="#6fcf97" stroke-dasharray="5 4"/><text x="'+(X0+W)+'" y="'+(y(r.M)-5)+'" text-anchor="end" font-size="10" fill="#6fcf97">máximo</text>';
+ sv+='<line x1="'+X0+'" x2="'+(X0+W)+'" y1="'+y(r.min)+'" y2="'+y(r.min)+'" stroke="#eb5757" stroke-dasharray="5 4"/><text x="'+(X0+W)+'" y="'+(y(r.min)-5)+'" text-anchor="end" font-size="10" fill="#eb5757">mínimo</text>';
+ sv+='<line x1="'+X0+'" x2="'+(X0+W)+'" y1="'+Y0+'" y2="'+Y0+'" stroke="#2d241a"/>';
+ var pts=[];for(var t=0;t<upto;t++)pts.push((X0+t/(DAYS-1)*W)+','+y(r.out[t]));
+ if(pts.length)sv+='<polyline fill="none" stroke="#ff8a1f" stroke-width="2.4" stroke-linejoin="round" points="'+pts.join(' ')+'"/><circle cx="'+pts[pts.length-1].split(',')[0]+'" cy="'+pts[pts.length-1].split(',')[1]+'" r="4.5" fill="#ffb347"/>';
+ sv+='<text x="'+X0+'" y="'+(Y0+16)+'" font-size="10" fill="#b9a68f">día 0</text><text x="'+(X0+W)+'" y="'+(Y0+16)+'" text-anchor="end" font-size="10" fill="#b9a68f">día '+DAYS+'</text>';
+ $('ch').innerHTML=sv;
+ $('v1').textContent=$('dm').value+' u/día';$('v2').textContent=$('lt').value;$('v3').textContent=$('ss').value+' u';$('v4').textContent=$('mx').value+' u';
+ $('kmin').textContent=r.min+' u';$('kq').textContent=r.q+' u';$('kb').textContent=r.brk;
+ $('adv').textContent=r.brk>0?'Hay días sin stock: sube el stock de seguridad o el máximo, o negocia un tiempo de entrega menor.':(r.M>r.min*3?'Sin quiebres, pero el máximo es alto: estás inmovilizando dinero en exceso.':'Sin quiebres y con un stock razonable. Buen equilibrio.');
+}
+function play(){clearInterval(timer);upto=1;timer=setInterval(function(){upto++;draw();if(upto>=DAYS)clearInterval(timer)},60)}
+['dm','lt','ss','mx'].forEach(function(i){$(i).oninput=function(){clearInterval(timer);upto=DAYS;draw()}});
+$('pl').onclick=play;draw();
+</script></body></html>
