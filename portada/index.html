@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portada · Equipo Nexus</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0b0906;overflow:hidden;font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif}
+  .hero{position:relative;width:100%;height:100%;overflow:hidden;background:#0b0906}
+  .hero video,.hero .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 4%}
+  .hero .still{opacity:0;transition:opacity .4s}
+  .hero.fallback .still{opacity:1}
+  .hero.fallback video{opacity:0}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 4.5% 14px;color:#fff;text-align:right;
+    background:linear-gradient(rgba(11,9,6,0),rgba(11,9,6,.78));
+    opacity:0;transform:translateY(10px);transition:opacity .8s ease,transform .8s ease;text-shadow:0 1px 10px rgba(0,0,0,.7)}
+  .hero.on .cap{opacity:1;transform:none}
+  .cap .d{font-size:clamp(11px,1.45vw,18px);font-weight:600;color:#ffd9a8;letter-spacing:.01em}
+  .cap .d em{font-style:normal;color:#ff8a1f;font-weight:800}
+  .cap .t{margin-top:.45em;font-size:clamp(9px,1vw,13px);letter-spacing:.14em;text-transform:uppercase;color:#e9dccb;opacity:.9}
+  .rep{position:absolute;left:12px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.35);color:#fff;font-size:15px;cursor:pointer;opacity:0;transition:opacity .3s}
+  .big{position:absolute;left:50%;top:50%;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;border:2px solid #ffb347;background:rgba(0,0,0,.45);color:#ffb347;font-size:26px;cursor:pointer;display:none;z-index:3}
+  .hero.blocked .big{display:block}
+  .hero.final .rep{opacity:.55}.hero.final .rep:hover{opacity:1}
+  /* phones / narrow frames: video on top at 16:9, caption underneath */
+  @media (max-aspect-ratio:11/10){
+    .hero video,.hero .still{height:auto;aspect-ratio:16/9;object-fit:cover;object-position:center top;bottom:auto}
+    .cap{top:56.25vw;bottom:auto;padding:12px 6% 0;text-align:left;background:none}
+    .cap .d{font-size:clamp(13px,4.2vw,20px)}
+    .cap .t{font-size:clamp(9px,2.6vw,12px);margin-top:.7em}
+  }
+  @media (prefers-reduced-motion:reduce){.cap{transition:none}}
+</style>
+</head>
+<body>
+<main class="hero" id="hero" aria-label="Portada del sitio">
+  <img class="still" src="final.webp" alt="Una caja de cartón abierta y de lado sobre una cinta transportadora, con luz cálida saliendo del interior y el título Gestión de inventarios">
+  <video id="v" muted playsinline preload="auto" poster="poster.webp" aria-hidden="true">
+    <source src="intro.mp4" type="video/mp4">
+  </video>
+  <h1 class="sr">Gestión de inventarios y herramientas digitales en las micro y pequeñas empresas (MYPES)</h1>
+  <div class="cap" id="cap">
+    <div class="d">Herramientas digitales para <em>micro y pequeñas empresas</em></div>
+    <div class="t">Equipo Nexus · Lazo · León · Vasquez · Villegas</div>
+  </div>
+  <button class="big" id="big" aria-label="Reproducir animación">&#9654;</button>
+  <button class="rep" id="rep" aria-label="Repetir animación" title="Repetir">&#8635;</button>
+</main>
+<script>
+(function(){
+  var hero=document.getElementById('hero'),v=document.getElementById('v');
+  var T_CAP=3.6, DUR=4.0, started=false, shown=false;
+  var q=new URLSearchParams(location.search);
+  var reduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function showCap(){ if(shown)return; shown=true; hero.classList.add('on'); }
+  function finish(){ hero.classList.add('final'); showCap(); }
+  function fallback(){ hero.classList.add('fallback'); finish(); }
+  function tick(){
+    if(v.currentTime>=T_CAP) showCap();
+    if(!v.ended&&!v.paused) requestAnimationFrame(tick);
+  }
+  function play(){
+    shown=false; hero.classList.remove('on','final','fallback');
+    try{v.currentTime=0}catch(e){}
+    var p=v.play(); if(p&&p.catch)p.catch(function(){ hero.classList.add('blocked'); fallback(); });
+    requestAnimationFrame(tick);
+    setTimeout(function(){ if(!shown) showCap(); },DUR*1000+1200);
+  }
+  v.addEventListener('ended',finish);
+  v.addEventListener('error',fallback);
+  document.getElementById('rep').addEventListener('click',play);
+  document.getElementById('big').addEventListener('click',function(){ hero.classList.remove('blocked'); play(); });
+  if(q.has('final')){ fallback(); return; }
+  function go(){ if(started)return; started=true; play(); }
+  if(v.readyState>=3) go(); else { v.addEventListener('canplaythrough',go); setTimeout(go,2500); }
+})();
+</script>
+</body>
+</html>
