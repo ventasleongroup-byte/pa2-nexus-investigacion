@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portada animada · Equipo Nexus</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#000;overflow:hidden}
+.st{position:relative;width:100%;height:100%}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+button{position:absolute;z-index:2;font:600 13px "Segoe UI",system-ui,sans-serif;color:#fff;background:rgba(11,22,32,.7);border:1px solid #ffffff66;border-radius:99px;cursor:pointer}
+#rp{right:8px;top:8px;width:34px;height:34px;font-size:15px;opacity:.55}
+#rp:hover{opacity:1}
+#pl{inset:0;margin:auto;width:72px;height:72px;font-size:26px;display:none;background:#d2aa6a;color:#0b1620;border:0}
+.sr{position:absolute;left:-9999px}
+</style></head><body>
+<div class="st">
+<video id="v" muted playsinline preload="auto" poster="../../portada/poster.webp" aria-label="Animación de portada: una caja se abre y aparece el título Gestión de inventarios en MYPES"><source src="../../portada/intro.mp4" type="video/mp4"></video>
+<h1 class="sr">Gestión de inventarios y herramientas digitales en las micro y pequeñas empresas (MYPES)</h1>
+<button id="rp" aria-label="Repetir animación" title="Repetir">↻</button>
+<button id="pl" aria-label="Reproducir">▶</button>
+</div>
+<script>
+var v=document.getElementById('v'),pl=document.getElementById('pl');
+function go(){pl.style.display='none';try{v.currentTime=0;var p=v.play();if(p&&p.catch)p.catch(function(){pl.style.display='block'})}catch(e){}}
+document.getElementById('rp').onclick=go;pl.onclick=function(){pl.style.display='none';v.play()};
+go();
+</script></body></html>

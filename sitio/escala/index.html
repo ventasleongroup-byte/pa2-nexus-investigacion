@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Escala de madurez digital · Equipo Nexus</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0f1f2d;overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif}
+svg{display:block;width:100%;height:100%}
+.s{opacity:0;transform:translateY(34px);transition:opacity .8s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.s.on{opacity:1;transform:none}
+button{position:absolute;right:8px;top:8px;width:30px;height:30px;border-radius:50%;border:1px solid #ffffff55;background:rgba(11,22,32,.6);color:#fff;cursor:pointer;opacity:.5}
+button:hover{opacity:1}
+</style></head><body>
+<svg id="sv" viewBox="0 0 440 224" role="img" aria-label="Escalera de cuatro peldaños que representa la escala de madurez digital: fiabilidad de los registros, clasificación ABC, base de datos compartida y nube con códigos de barras y RFID"></svg>
+<button id="rp" aria-label="Repetir animación">↻</button>
+<script>
+/* ===== EDIT HERE: step labels (name, line 1, line 2) ===== */
+var ESC=[["Natali","Fiabilidad de los","registros"],["Fabio","Clasificación","ABC"],["Marghiory","Base de datos","compartida"],["Franluis","Nube, códigos de","barras y RFID"]];
+/* ========================================================= */
+var W=76,out='<line x1="8" y1="206" x2="432" y2="206" stroke="#2a4356"/><text x="12" y="20" font-size="11" fill="#98a9b5" letter-spacing=".12em">MADUREZ DIGITAL →</text>';
+ESC.forEach(function(e,i){var x=12+i*104,h=52+i*40,y=206-h,dx=34,dy=-18,c=x+W/2;
+ out+='<g class="s"><polygon points="'+x+','+y+' '+(x+W)+','+y+' '+(x+W)+',206 '+x+',206" fill="#1c3a50"/><polygon points="'+(x+W)+','+y+' '+(x+W+dx)+','+(y+dy)+' '+(x+W+dx)+','+(206+dy)+' '+(x+W)+',206" fill="#14293a"/><polygon points="'+x+','+y+' '+(x+dx)+','+(y+dy)+' '+(x+W+dx)+','+(y+dy)+' '+(x+W)+','+y+'" fill="'+(i==3?'#e6c58d':'#d2aa6a')+'"/>'+
+ '<text x="'+c+'" y="'+(y+26)+'" text-anchor="middle" font-size="13.5" font-weight="700" fill="#ecefe9">'+e[0]+'</text><text x="'+c+'" y="'+(y+42)+'" text-anchor="middle" font-size="10" fill="#b9c8d1">'+e[1]+'</text><text x="'+c+'" y="'+(y+54)+'" text-anchor="middle" font-size="10" fill="#b9c8d1">'+e[2]+'</text></g>'});
+var sv=document.getElementById('sv');sv.innerHTML=out;var G=sv.querySelectorAll('.s'),T=[];
+function play(){T.forEach(clearTimeout);T=[];[].forEach.call(G,function(g){g.classList.remove('on')});[].forEach.call(G,function(g,i){T.push(setTimeout(function(){g.classList.add('on')},500+i*900))})}
+document.getElementById('rp').onclick=play;play();
+</script></body></html>
