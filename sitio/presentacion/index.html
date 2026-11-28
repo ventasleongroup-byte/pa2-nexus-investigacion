@@ -1,133 +1,189 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Presentación · Equipo Nexus</title>
-<link rel="stylesheet" href="../base.css">
 <style>
-html,body{height:100%;overflow:hidden}
-body{padding:0;display:flex;flex-direction:column}
-/* ---------- header: full-frame intro, then compact strip (15 %) ---------- */
-.hd{position:relative;flex:none;height:100%;overflow:hidden;background:#000;transition:height 1s cubic-bezier(.65,0,.25,1)}
+:root{--bg:#07131b;--bg2:#0d2231;--card:#10293a;--line:#1f4256;--ink:#eaf3f5;--mut:#9db5c0;--teal:#2fd1c5;--teal2:#7ae7de;--kraft:#e3a869}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.45}
+body{display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer;border:0;color:inherit;background:none}
+:focus-visible{outline:2px solid var(--teal2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---------- header: full-frame intro, then compact 15 % strip ---------- */
+.hd{position:relative;flex:none;height:100%;overflow:hidden;background:#000;transition:height 1.1s cubic-bezier(.65,0,.25,1)}
 body.compact .hd{height:15%;min-height:78px}
-.hd video,.hd .strip{position:absolute;inset:0;width:100%;height:100%}
+.hd video,.strip{position:absolute;inset:0;width:100%;height:100%}
 .hd video{object-fit:cover;object-position:center 60%;transition:opacity .8s}
 body.compact .hd video{opacity:0}
-.strip{background:#0b0906 url(../img/franja.webp) center 40%/cover no-repeat;opacity:0;transition:opacity .8s .3s;display:flex;align-items:center;padding:0 clamp(14px,3vw,28px)}
-.strip::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,9,6,.7) 28%,rgba(11,9,6,.97) 46%)}
+.strip{background:var(--bg) url(../img/franja.webp) center 40%/cover no-repeat;opacity:0;transition:opacity .8s .3s;display:flex;align-items:center;padding:0 clamp(14px,3vw,30px)}
+.strip::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,19,27,.78) 28%,rgba(7,19,27,.97) 48%)}
 body.compact .strip{opacity:1}
-.strip div{position:relative}
+.strip>div{position:relative}
 .strip b{display:block;font-size:clamp(16px,3.2vw,28px);font-weight:800;line-height:1.1}
-.strip b em{font-style:normal;color:var(--amber)}
+.strip b em{font-style:normal;color:var(--teal)}
 .strip span{display:block;margin-top:4px;font-size:clamp(10.5px,1.6vw,13px);color:var(--mut)}
-.ctl{position:absolute;right:10px;top:10px;display:flex;gap:6px;z-index:3}
-.ctl button{width:32px;height:32px;padding:0;border-radius:50%;background:rgba(11,9,6,.65);color:#fff;border:1px solid #ffffff55;font-size:14px}
-.skip{position:absolute;right:12px;bottom:12px;z-index:3;font-size:12.5px;padding:.35em 1em;background:rgba(11,9,6,.7);color:#fff;border:1px solid #ffffff55}
+.rp{position:absolute;right:10px;top:10px;z-index:3;width:32px;height:32px;border-radius:50%;background:rgba(7,19,27,.65);border:1px solid #ffffff55;color:#fff;font-size:14px}
+.skip{position:absolute;right:12px;bottom:12px;z-index:3;font-size:12.5px;padding:.35em 1em;border-radius:99px;background:rgba(7,19,27,.7);color:#fff;border:1px solid #ffffff55}
 body.compact .skip{display:none}
-#pl{position:absolute;inset:0;margin:auto;width:76px;height:76px;border-radius:50%;z-index:3;font-size:28px;display:none}
-/* ---------- body: steps + paragraph ---------- */
-.main{flex:1;min-height:0;display:grid;grid-template-columns:230px 1fr;gap:16px;padding:16px clamp(14px,3vw,28px) 8px;opacity:0;transition:opacity .7s .5s}
-body.compact .main,body.compact .bar{opacity:1}
-@media (max-width:760px){.main{grid-template-columns:1fr;gap:10px;padding-top:10px}}
-.steps{display:flex;flex-direction:column;gap:6px;overflow:auto}
-@media (max-width:760px){.steps{flex-direction:row;overflow-x:auto;padding-bottom:4px}}
-.st{flex:none;text-align:left;display:flex;gap:10px;align-items:center;background:var(--card);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:600;font-size:13.5px;transition:border-color .25s,background .25s}
-.st i{font-style:normal;flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:#241c13;color:var(--amber2)}
-.st:hover{border-color:var(--amber)}
-.st.on{border-color:var(--amber);background:#1d1610}
-.st.on i{background:var(--amber);color:var(--bg)}
-.st.done i{background:#3a2e20}
-@media (max-width:760px){.st span{display:none}.st.on span{display:inline}}
-.pn{position:relative;display:flex;flex-direction:column;min-height:0}
-.pn .txt{flex:1;min-height:0;overflow:auto;padding-right:6px}
-.pn h2{font-size:clamp(18px,2.6vw,24px);margin-top:4px}
-.pn p{margin-top:.8em;font-size:clamp(14px,1.8vw,16px);line-height:1.6}
-.pn .txt>*{animation:in .45s ease both}
-@keyframes in{from{opacity:0;transform:translateY(10px)}}
-.nx{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-.nx .c{font-size:12.5px;color:var(--mut)}
-.nx button:disabled{opacity:.3;cursor:default}
-.go{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
-.go .btn{font-size:13px;padding:.4em 1em}
-.off{opacity:.4;pointer-events:none}
-.prog{height:3px;background:var(--line);border-radius:2px;margin-bottom:10px;overflow:hidden}
-.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--amber2));transition:width .5s}
-/* ---------- bottom nav ---------- */
-.bar{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px clamp(14px,3vw,28px) 10px;border-top:1px solid var(--line);background:#0f0c08;opacity:0;transition:opacity .7s .6s;font-size:12.5px}
-.bar>span{color:var(--mut);margin-right:2px}
-.bar a{color:var(--amber2);border:1px solid #ff8a1f66;border-radius:999px;padding:.25em .8em;text-decoration:none;font-weight:600}
-.bar a:hover{background:var(--amber);color:var(--bg)}
-.bar .ft{flex-basis:100%;color:var(--mut);font-size:11px;line-height:1.35}
-@media (max-width:760px){.bar .ft{display:none}}
+#pl{position:absolute;inset:0;margin:auto;width:76px;height:76px;border-radius:50%;z-index:3;font-size:28px;display:none;background:var(--teal);color:var(--bg)}
+/* ---------- stage ---------- */
+.stage{position:relative;flex:1;min-height:0;overflow:hidden;opacity:0;transition:opacity .8s .6s;background:radial-gradient(900px 420px at 80% 10%,#12384a55,transparent 70%),radial-gradient(700px 400px at 5% 100%,#e3a86914,transparent 70%)}
+body.compact .stage,body.compact .bar{opacity:1}
+.sc{position:absolute;inset:0;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(16px,3vw,44px);padding:clamp(14px,2.6vw,30px) clamp(16px,3.4vw,40px);opacity:0;transform:translateX(var(--dx,60px));filter:blur(8px);transition:opacity .6s ease,transform .7s cubic-bezier(.2,.7,.2,1),filter .6s ease;pointer-events:none}
+.sc.cur{opacity:1;transform:none;filter:none;pointer-events:auto}
+.sc.out{opacity:0;transform:translateX(calc(var(--dx,60px)*-1));filter:blur(8px)}
+@media (max-width:760px){.sc{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 34%;gap:10px}}
+.tx{position:relative;min-height:0;overflow:auto;padding-right:6px;align-self:center;max-height:100%}
+.no{position:absolute;right:0;top:-8px;font-size:clamp(70px,12vw,130px);font-weight:900;line-height:1;color:#2fd1c512;pointer-events:none}
+.tx h2{position:relative;font-size:clamp(20px,3.1vw,31px);line-height:1.15;font-weight:800;padding-bottom:10px;max-width:90%}
+.tx h2::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;border-radius:2px;background:linear-gradient(90deg,var(--teal),var(--kraft));transition:width 1s ease .3s}
+.sc.cur h2::after{width:72px}
+.tx p{margin-top:.85em;font-size:var(--fs,clamp(14px,1.75vw,16.5px));line-height:1.65;color:#d6e4e8}
+.w{display:inline-block;white-space:pre;opacity:0;transform:translateY(9px);filter:blur(5px);transition:opacity .35s,transform .35s,filter .35s}
+.w.on{opacity:1;transform:none;filter:none}
+.w.k.on{color:var(--teal2);font-weight:700}
+.go{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .6s,transform .6s}
+.done .go{opacity:1;transform:none}
+.chip{display:inline-block;text-decoration:none;font-weight:700;font-size:13px;color:var(--bg);background:var(--teal);border-radius:99px;padding:.45em 1.1em;transition:transform .2s,background .2s}
+.chip:hover{background:var(--teal2);transform:translateY(-2px)}
+.chip.off{opacity:.35;pointer-events:none}
+/* media */
+.md{position:relative;min-height:0;display:grid;gap:12px;grid-auto-rows:minmax(0,1fr);align-content:center}
+.ph{position:relative;overflow:hidden;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.45);opacity:0;transform:scale(.93) translateY(18px) rotate(var(--r,0deg));clip-path:inset(0 0 100% 0 round 16px);transition:opacity .7s,transform .9s cubic-bezier(.2,.8,.2,1),clip-path .9s cubic-bezier(.2,.8,.2,1)}
+.ph.on{opacity:1;transform:rotate(var(--r,0deg));clip-path:inset(0 0 0 0 round 16px)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02)}
+.ph.on img{animation:kb 14s ease-out both}
+@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+.ph.ct img{object-fit:contain;animation:none}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 6px;font-size:10.5px;color:#fff;background:linear-gradient(transparent,rgba(7,19,27,.85))}
+.nv{display:grid;gap:10px;align-content:center;opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s}
+.done .nv{opacity:1;transform:none}
+.nv .chip{font-size:15px;padding:.7em 1.2em;text-align:center;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.nv .chip:hover{border-color:var(--teal);background:#143448}
+/* bottom bar */
+.bar{flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;padding:8px clamp(14px,3vw,30px) 9px;border-top:1px solid var(--line);background:#06101700;background:#071720;opacity:0;transition:opacity .7s .7s;font-size:12.5px}
+.ct{display:flex;align-items:center;gap:10px}
+.ar{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:16px;line-height:1}
+.ar:hover:not(:disabled){border-color:var(--teal);color:var(--teal2)}
+.ar:disabled{opacity:.3;cursor:default}
+.dots{display:flex;gap:7px}
+.dots button{width:9px;height:9px;border-radius:50%;background:#2b4c5e;transition:all .3s}
+.dots button.on{width:26px;border-radius:5px;background:var(--teal)}
+.lk{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lk span{color:var(--mut)}
+.lk a,.cr{color:var(--teal2);border:1px solid #2fd1c555;border-radius:99px;padding:.22em .8em;text-decoration:none;font-weight:600;font-size:12px}
+.lk a:hover,.cr:hover{background:var(--teal);color:var(--bg)}
+.lk a.off{opacity:.4;pointer-events:none}
+@media (max-width:760px){.lk{display:none}.bar{justify-content:center}}
+/* credits overlay */
+.ov{position:absolute;inset:0;z-index:5;background:rgba(5,14,20,.96);padding:clamp(16px,3vw,34px);overflow:auto;display:none}
+.ov.show{display:block}
+.ov h2{font-size:20px}
+.ov p{margin-top:.8em;font-size:13.5px;line-height:1.6;color:#d6e4e8;padding-left:2em;text-indent:-2em}
+.ov .n{margin-top:1.2em;font-size:12.5px;color:var(--mut);max-width:70ch;padding:0;text-indent:0}
+.ov button{position:sticky;float:right;top:0;border:1px solid var(--line);border-radius:99px;padding:.3em 1em;background:var(--card)}
 .sr{position:absolute;left:-9999px}
 </style></head><body>
 <header class="hd" id="hd">
  <video id="v" muted playsinline preload="auto" poster="../../portada/poster.webp" aria-hidden="true"><source src="../../portada/intro.mp4" type="video/mp4"></video>
  <div class="strip"><div><b>Gestión de <em>inventarios</em> en MYPES</b><span>Equipo Nexus · Herramientas virtuales para el aprendizaje · 2026-2</span></div></div>
  <h1 class="sr">Gestión de inventarios y herramientas digitales en las micro y pequeñas empresas (MYPES)</h1>
- <div class="ctl"><button id="rp" aria-label="Repetir introducción" title="Repetir introducción">↻</button></div>
+ <button class="rp" id="rp" aria-label="Repetir introducción" title="Repetir introducción">↻</button>
  <button class="skip" id="sk">Saltar introducción</button>
  <button id="pl" aria-label="Reproducir introducción">▶</button>
 </header>
-<section class="main" id="mn">
- <nav class="steps" id="st" aria-label="Secciones de la presentación"></nav>
- <article class="panel pn">
-  <div class="prog"><i id="pg"></i></div>
-  <div class="txt" id="tx" aria-live="polite"></div>
-  <div class="nx"><button class="ghost" id="pv">← Anterior</button><span class="c" id="ct"></span><button id="nt">Siguiente →</button></div>
- </article>
-</section>
-<nav class="bar" id="br" aria-label="Ir a otras páginas"></nav>
+<main class="stage" id="sg" aria-live="polite"></main>
+<nav class="bar" id="br" aria-label="Navegación">
+ <div class="lk" id="lk"></div>
+ <div class="ct"><button class="ar" id="pv" aria-label="Anterior">‹</button><div class="dots" id="dt"></div><button class="ar" id="nt" aria-label="Siguiente">›</button></div>
+ <button class="cr" id="cr">Créditos de imágenes</button>
+</nav>
+<div class="ov" id="ov" role="dialog" aria-label="Créditos de imágenes"><button id="cx">Cerrar ✕</button><div id="cl"></div></div>
 <script>
-/* ===== EDIT HERE: texts and Google Sites page addresses ===== */
-var PAGES=[ /* paste each page's published address in url */
+/* ===== EDIT HERE: texts, images and Google Sites page addresses =====
+   In the texts: [[word ... word]] = highlighted phrase ; §N before a word = image N appears at that word. */
+var PAGES=[ /* paste each published page address in url */
  {t:"Presentación",url:""},
  {t:"Contenido académico",url:""},
  {t:"Aprendizaje colaborativo",url:""},
  {t:"Conclusiones",url:""},
  {t:"Autoría",url:""}];
-var FOOT="© 2026 Equipo Nexus. Este sitio se publica bajo una licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional (CC BY-SA 4.0). Las imágenes y los textos de terceros conservan sus propias licencias.";
+var IMG={ /* a = author (APA), d = date (APA, Spanish), t = title, lic = license, u = Commons page */
+ mercado:{a:"Anthu0811",c:"Anthu0811 (2025)",d:"2025, 14 de agosto",t:"Puestos variados en el Mercado N°1 de Tocache, Perú (2025)",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:Puestos_variados_en_el_Mercado_N%C2%B01_de_Tocache,_Per%C3%BA_(2025).jpg"},
+ wms:{a:"Vatumalae, V., Rajagopal, P., & Veera Pandiyan, K. S.",c:"Vatumalae et al. (2020)",d:"2020, agosto",t:"Typical features of a Warehouse Management System",lic:"CC BY 4.0",u:"https://commons.wikimedia.org/wiki/File:Typical_features_of_a_Warehouse_Management_System.png",fit:"ct"},
+ exceso:{a:"PattayaPatrol",c:"PattayaPatrol (2025)",d:"2025, 24 de febrero",t:"DSC 9549 A cluttered warehouse aisle filled with stacked boxes piles of cardboard and various tools and supplies stretching into the dim interior",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:DSC_9549_A_cluttered_warehouse_aisle_filled_with_stacked_boxes_piles_of_cardboard_and_various_tools_and_supplies_stretching_into_the_dim_interior.jpg"},
+ fruta:{a:"Anthu0811",c:"Anthu0811 (2025)",d:"2025, 14 de agosto",t:"Puesto de frutas en el Mercado N°1 de Tocache, Perú (2025)",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:Puesto_de_frutas_en_el_Mercado_N%C2%B01_de_Tocache,_Per%C3%BA_(2025).jpg"},
+ barras:{a:"Lenkowski, A.",c:"Lenkowski (2015)",d:"2015, 9 de abril",t:"HDWR HD2000 Wireless Barcode Reader",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:HDWR_HD2000_Wireless_Barcode_Reader.png",fit:"ct"},
+ rfid:{a:"Anonymous Agent",c:"Anonymous Agent (2021)",d:"2021, 16 de abril",t:"13.56MHz RFID tags",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:13.56MHz_RFID_tags.jpg"},
+ notas:{a:"Shixart1985",c:"Shixart1985 (2026)",d:"2026, 7 de junio",t:"Person writing in a notebook while sitting at a desk",lic:"CC BY 2.0",u:"https://commons.wikimedia.org/wiki/File:Person_writing_in_a_notebook_while_sitting_at_a_desk.jpg"}
+};
 var S=[
- {t:"Problema general",
-  x:["En Perú, las pequeñas y micro empresas (MYPE) representan el 99,1 % de las 2,34 millones de empresas formales registradas en 2024 y aportan el 20,2 % del PBI (Ministerio de la Producción [PRODUCE], 2025). Sin embargo, la importancia de sus inventarios varía considerablemente, al igual que la forma en que la mayoría de estos negocios gestionan sus existencias: recurriendo a pequeños libros de registro, hojas de cálculo sin actualizar o, simplemente, a la memoria del propietario.",
-     "El resultado es un problema silencioso de doble vertiente: por un lado, los productos se acumulan, inmovilizando capital; por otro, la escasez provoca la pérdida de ventas y de clientes. Este sitio web analiza las causas fundamentales de este desequilibrio y explora diversas herramientas, desde software local básico hasta tecnología RFID, que pueden contribuir a ofrecer una solución."]},
- {t:"Resumen de la problemática",
-  x:["En el Perú, las micro y pequeñas empresas (MYPE) constituyen el 99,1 % del sector empresarial formal y aportan el 20,2 % al PIB nacional; sin embargo, la mayoría gestiona sus inventarios de manera informal, ya sea mediante pequeños cuadernos de registro, sistemas manuales obsoletos o, simplemente, confiando en la memoria. Esta falta de control genera un doble problema: un exceso de inventario que inmoviliza capital, e ineficiencias que derivan en la pérdida de ventas y de clientes.",
+ {t:"Problema general",im:["mercado","wms"],
+  x:["En Perú, las pequeñas y micro empresas (MYPE) §0representan el [[99,1 %]] de las 2,34 millones de empresas formales registradas en 2024 y aportan el [[20,2 %]] del PBI (Ministerio de la Producción [PRODUCE], 2025). Sin embargo, la importancia de sus inventarios varía considerablemente, al igual que la forma en que la mayoría de estos negocios gestionan sus existencias: recurriendo a pequeños libros de registro, hojas de cálculo sin actualizar o, simplemente, a la memoria del propietario.",
+     "El resultado es un problema silencioso de [[doble vertiente]]: por un lado, los productos se acumulan, inmovilizando capital; por otro, la escasez provoca la pérdida de ventas y de clientes. Este sitio web analiza las causas fundamentales de este desequilibrio y §1explora diversas herramientas, desde software local básico hasta tecnología RFID, que pueden contribuir a ofrecer una solución."]},
+ {t:"Resumen de la problemática",im:["exceso"],
+  x:["En el Perú, las micro y pequeñas empresas (MYPE) constituyen el 99,1 % del sector empresarial formal y aportan el 20,2 % al PIB nacional; sin embargo, la mayoría gestiona sus inventarios de manera informal, ya sea mediante pequeños cuadernos de registro, sistemas manuales obsoletos o, simplemente, confiando en la memoria. Esta falta de control genera un [[doble problema]]: un §0[[exceso de inventario]] que inmoviliza capital, e ineficiencias que derivan en la [[pérdida de ventas]] y de clientes.",
      "Por consiguiente, este sitio analiza las causas del desequilibrio y explora diversas soluciones, que van desde aplicaciones de software hasta tecnología RFID."]},
- {t:"Importancia del tema de investigación",
-  x:["El estudio de este tema es importante porque el inventario suele ser uno de los activos más valiosos para una micro, pequeña o mediana empresa (MYPES); sin embargo, es a su vez, uno de los menos controlados. Rivero Sánchez et al. (2026) sostienen que la gestión eficiente de las existencias ya no es una mera tarea operativa, sino un factor estratégico del cual dependen la supervivencia y el desarrollo de una organización (p. 17).",
-     "Esta afirmación cobra aún mayor relevancia en el Perú, donde las MYPES representan el 86,5 % del empleo en el sector privado (PRODUCE, 2025). Cuando una MYPE pierde dinero debido a una deficiente planificación de las adquisiciones o a la caducidad de sus productos, no solo están en juego sus beneficios, sino también los puestos de trabajo que sostiene. Por consiguiente, comprender cómo se controla el inventario resulta fundamental para entender la sostenibilidad de la economía nacional."]},
- {t:"Arquitectura del sitio",links:true,
-  x:["Esta sección representa una parte del recorrido desde el problema hasta la solución, y abarca cuatro temas que conforman una «escala de madurez digital» (Figura 2). En el apartado «Contenido académico», Natali analiza el estado inicial, la fiabilidad de los registros, sin el cual no es posible realizar un trabajo significativo; Fabio explica cómo la clasificación ABC ayuda a identificar los activos que requieren una gestión adecuada; Marghiory demuestra por qué una base de datos compartida, que abarca desde niveles básicos hasta avanzados, constituye el primer paso idóneo hacia la digitalización; y Franluis presenta la etapa: software basado en la nube, códigos de barras y tecnología RFID.",
+ {t:"Importancia del tema de investigación",im:["fruta"],
+  x:["El estudio de este tema es importante porque el inventario suele ser uno de los activos más valiosos para una micro, pequeña o mediana empresa (MYPES); sin embargo, es a su vez, uno de los [[menos controlados]]. Rivero Sánchez et al. (2026) sostienen que la gestión eficiente de las existencias ya no es una mera tarea operativa, sino un [[factor estratégico]] del cual dependen la supervivencia y el desarrollo de una organización (p. 17).",
+     "Esta afirmación cobra aún mayor relevancia en el Perú, donde las MYPES §0representan el [[86,5 %]] del empleo en el sector privado (PRODUCE, 2025). Cuando una MYPE pierde dinero debido a una deficiente planificación de las adquisiciones o a la caducidad de sus productos, no solo están en juego sus beneficios, sino también los puestos de trabajo que sostiene. Por consiguiente, comprender cómo se controla el inventario resulta fundamental para entender la sostenibilidad de la economía nacional."]},
+ {t:"Arquitectura del sitio",im:["barras","rfid"],links:true,
+  x:["Esta sección representa una parte del recorrido desde el problema hasta la solución, y abarca cuatro temas que conforman una «[[escala de madurez digital]]» (Figura 2). En el apartado «Contenido académico», Natali analiza el estado inicial, la fiabilidad de los registros, sin el cual no es posible realizar un trabajo significativo; Fabio explica cómo la clasificación ABC ayuda a identificar los activos que requieren una gestión adecuada; Marghiory demuestra por qué una base de datos compartida, que abarca desde niveles básicos hasta avanzados, constituye el primer paso idóneo hacia la digitalización; y Franluis presenta la etapa: software basado en la nube, §0códigos de barras y §1tecnología RFID.",
      "Asimismo, la sección titulada «Aprendizaje colaborativo» aborda el proceso de trabajo en equipo; «Resultados» resume la respuesta de cada integrante ante el problema; y «Autoría» identifica a los creadores del trabajo."]},
- {t:"Limitaciones del equipo",
-  x:["Este trabajo presenta ciertas limitaciones que cabe señalar. En primer lugar, se basa en una revisión bibliográfica y no en trabajo de campo; el equipo no analizó directamente los registros de ninguna micro, pequeña o mediana empresa (MYPES). En segundo lugar, algunas fuentes provienen de contextos diversos —como un informe del Ministerio de Economía, Industria y Comercio de Costa Rica o un estudio realizado en una cadena minorista extranjera—, lo que implica que sus hallazgos deben interpretarse con cautela antes de aplicarlos al contexto peruano.",
-     "Por último, el equipo trabajó de forma remota y bajo estrictas limitaciones de tiempo, lo que obligó a centrarse en fuentes de fácil acceso. No obstante, cada referencia ha sido verificada con su documento original."]}
+ {t:"Limitaciones del equipo",im:["notas"],
+  x:["Este trabajo presenta ciertas limitaciones que cabe señalar. En primer lugar, §0se basa en una [[revisión bibliográfica]] y no en trabajo de campo; el equipo no analizó directamente los registros de ninguna micro, pequeña o mediana empresa (MYPES). En segundo lugar, algunas fuentes provienen de contextos diversos —como un informe del Ministerio de Economía, Industria y Comercio de Costa Rica o un estudio realizado en una cadena minorista extranjera—, lo que implica que sus hallazgos deben interpretarse con cautela antes de aplicarlos al contexto peruano.",
+     "Por último, el equipo trabajó de forma remota y bajo estrictas limitaciones de tiempo, lo que obligó a centrarse en fuentes de fácil acceso. No obstante, [[cada referencia ha sido verificada]] con su documento original."]},
+ {t:"Elige por dónde seguir",nav:true,im:[],
+  x:["Ya conoces el problema, por qué importa, cómo está organizado este sitio y dónde están sus límites. Ahora puedes entrar al [[contenido académico]], ver el trabajo en equipo, leer las conclusiones o conocer a los autores."]}
 ];
-/* ============================================================ */
-var $=function(i){return document.getElementById(i)},cur=0,B=[],done=0;
-var v=$('v'),rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
-function compact(){document.body.classList.add('compact');v.pause()}
+var NOTE="Imágenes tomadas de Wikimedia Commons y usadas bajo sus licencias Creative Commons: se indican autoría, licencia y enlace de origen. Solo se redimensionaron para la web; no se alteró su contenido. Las licencias CC BY-SA exigen compartir las adaptaciones con la misma licencia, por eso este sitio se publica bajo CC BY-SA 4.0. Los textos y las imágenes de terceros conservan sus propias licencias.";
+/* ================================================================ */
+var $=function(i){return document.getElementById(i)},cur=-1,TM=null,W=[],TRG={},wi=0,curEl=null,v=$('v');
+var rm=matchMedia('(prefers-reduced-motion:reduce)').matches,Q=location.search;
+function compact(){document.body.classList.add('compact');v.pause();if(cur<0)show(+(/[?&]s=(\d)/.exec(Q)||[0,0])[1],1)}
 function intro(){document.body.classList.remove('compact');$('pl').style.display='none';
  try{v.currentTime=0;var p=v.play();if(p&&p.catch)p.catch(function(){$('pl').style.display='block'})}catch(e){}}
-v.addEventListener('ended',compact);
-$('sk').onclick=compact;$('rp').onclick=intro;
+v.addEventListener('ended',compact);$('sk').onclick=compact;$('rp').onclick=intro;
 $('pl').onclick=function(){$('pl').style.display='none';v.play()};
-v.addEventListener('timeupdate',function(){if(v.duration&&v.currentTime>v.duration-.05)compact()});
-function pageLinks(){return PAGES.map(function(p){return p.url?'<a class="btn" href="'+p.url+'" target="_top">'+p.t+'</a>':'<a class="btn off" aria-disabled="true">'+p.t+'</a>'}).join('')}
-/* steps */
-S.forEach(function(s,i){var b=document.createElement('button');b.type='button';b.className='st';
- b.innerHTML='<i>'+(i+1)+'</i><span>'+s.t+'</span>';b.onclick=function(){go(i)};$('st').appendChild(b);B.push(b)});
-function go(i){cur=i;done=Math.max(done,i);var s=S[i];
- B.forEach(function(b,k){b.classList.toggle('on',k===i);b.classList.toggle('done',k<done&&k!==i)});
- $('tx').innerHTML='<h2>'+s.t+'</h2>'+s.x.map(function(p){return'<p>'+p+'</p>'}).join('')+(s.links?'<div class="go"><span class="tag" style="width:100%">Ir directamente a</span>'+pageLinks()+'</div>':'');
- $('tx').scrollTop=0;
- $('ct').textContent=(i+1)+' de '+S.length;$('pg').style.width=((i+1)/S.length*100)+'%';
- $('pv').disabled=i===0;$('nt').textContent=i===S.length-1?'Volver al inicio ↺':'Siguiente →'}
-$('pv').onclick=function(){if(cur>0)go(cur-1)};
-$('nt').onclick=function(){go(cur===S.length-1?0:cur+1)};
-document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')$('nt').click();if(e.key==='ArrowLeft')$('pv').click()});
-/* bottom bar */
-$('br').innerHTML='<span>Ir a:</span>'+PAGES.map(function(p){return p.url?'<a href="'+p.url+'" target="_top">'+p.t+'</a>':'<a style="opacity:.45;pointer-events:none">'+p.t+'</a>'}).join('')+'<div class="ft">'+FOOT+'</div>';
-go(0);
-/* start: ?final or reduced motion skips the intro */
-if(rm||/[?&]final/.test(location.search))compact();else intro();
+function links(cls){return PAGES.map(function(p){return p.url?'<a class="chip" href="'+p.url+'" target="_top">'+p.t+'</a>':'<a class="chip off" aria-disabled="true">'+p.t+'</a>'}).join('')}
+function build(i){var s=S[i],el=document.createElement('section');el.className='sc';
+ var tx=document.createElement('div');tx.className='tx';
+ tx.innerHTML='<span class="no">0'+(i+1)+'</span><h2>'+s.t+'</h2>';
+ W=[];TRG={};var n=0;
+ s.x.forEach(function(p){var pe=document.createElement('p'),hl=false;
+  p.split(/\s+/).forEach(function(tok){var m=/^§(\d)(.*)$/.exec(tok);if(m){TRG[n]=+m[1];tok=m[2]}
+   if(tok.indexOf('[[')>=0){hl=true;tok=tok.replace('[[','')}var end=false;if(tok.indexOf(']]')>=0){end=true;tok=tok.replace(']]','')}
+   var w=document.createElement('span');w.className='w'+(hl?' k':'');w.textContent=tok+' ';pe.appendChild(w);W.push(w);n++;if(end)hl=false});
+  tx.appendChild(pe)});
+ if(s.links){var g=document.createElement('div');g.className='go';g.innerHTML=links();tx.appendChild(g)}
+ var md=document.createElement('div');md.className='md';
+ if(s.nav){md.className='md';md.innerHTML='<div class="nv">'+links()+'</div>'}
+ else s.im.forEach(function(k,j){var d=IMG[k],ph=document.createElement('figure');ph.className='ph'+(d.fit=='ct'?' ct':'');ph.style.setProperty('--r',(s.im.length>1?(j?1.2:-1.2):0)+'deg');
+  ph.innerHTML='<img src="../img/'+k+'.webp" alt="'+d.t+'" loading="eager"><figcaption class="cap">'+d.c+' · '+d.lic+' · Wikimedia Commons</figcaption>';md.appendChild(ph)});
+ el.appendChild(tx);el.appendChild(md);return el}
+function tick(){if(wi>=W.length){clearInterval(TM);curEl.classList.add('done');return}
+ W[wi].classList.add('on');if(TRG[wi]!=null){var f=curEl.querySelectorAll('.ph')[TRG[wi]];if(f)f.classList.add('on')}
+ wi++;var t=curEl.querySelector('.tx');if(t.scrollHeight>t.clientHeight)t.scrollTop=t.scrollHeight}
+function finish(){clearInterval(TM);while(wi<W.length)tick();curEl.querySelectorAll('.ph').forEach(function(f){f.classList.add('on')});curEl.classList.add('done')}
+function fit(t){var f=Math.min(16.5,Math.max(14,innerWidth*.0175));t.style.removeProperty('--fs');while(t.scrollHeight>t.clientHeight+2&&f>12.5){f-=.5;t.style.setProperty('--fs',f+'px')}}
+function show(i,instant){if(i<0||i>=S.length)return;var dir=i>=cur?1:-1,old=curEl;clearInterval(TM);
+ if(old){old.style.setProperty('--dx',(60*dir)+'px');old.classList.remove('cur');old.classList.add('out');setTimeout(function(){old.remove()},800)}
+ cur=i;curEl=build(i);curEl.style.setProperty('--dx',(60*dir)+'px');$('sg').appendChild(curEl);wi=0;fit(curEl.querySelector('.tx'));
+ void curEl.offsetWidth;curEl.classList.add('cur');
+ [].forEach.call($('dt').children,function(b,k){b.classList.toggle('on',k===i)});
+ $('pv').disabled=i===0;$('nt').disabled=i===S.length-1;
+ if(instant&&/[?&]done/.test(Q))finish();else TM=setInterval(tick,rm?15:46)}
+function next(){if(wi<W.length&&cur>=0){finish();return}show(cur+1)}
+function prev(){show(cur-1)}
+$('nt').onclick=next;$('pv').onclick=prev;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowDown')next();if(e.key==='ArrowLeft'||e.key==='ArrowUp')prev();if(e.key==='Escape')$('ov').classList.remove('show')});
+var tx0=null;document.addEventListener('touchstart',function(e){tx0=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){if(tx0==null)return;var d=e.changedTouches[0].clientX-tx0;tx0=null;if(Math.abs(d)>60)(d<0?next:prev)()});
+S.forEach(function(s,i){var b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Ir a: '+s.t);b.onclick=function(){show(i)};$('dt').appendChild(b)});
+$('lk').innerHTML='<span>Ir a:</span>'+PAGES.map(function(p){return p.url?'<a href="'+p.url+'" target="_top">'+p.t+'</a>':'<a class="off">'+p.t+'</a>'}).join('');
+/* credits (APA 7, image) */
+var seen={};S.forEach(function(s){(s.im||[]).forEach(function(k){seen[k]=1})});
+$('cl').innerHTML='<h2>Créditos de imágenes</h2>'+Object.keys(seen).map(function(k){var d=IMG[k];return'<p>'+d.a+' ('+d.d+'). <i>'+d.t+'</i> [Fotografía]. Wikimedia Commons. '+d.lic+'. <a style="color:var(--teal2)" href="'+d.u+'" target="_blank" rel="noopener">'+d.u+'</a></p>'}).join('')+'<p class="n">'+NOTE+'</p>';
+$('cr').onclick=function(){$('ov').classList.add('show')};$('cx').onclick=function(){$('ov').classList.remove('show')};
+if(rm||/[?&]final/.test(Q))compact();else intro();
 </script></body></html>
