@@ -2,188 +2,295 @@
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Presentación · Equipo Nexus</title>
 <style>
-:root{--bg:#07131b;--bg2:#0d2231;--card:#10293a;--line:#1f4256;--ink:#eaf3f5;--mut:#9db5c0;--teal:#2fd1c5;--teal2:#7ae7de;--kraft:#e3a869}
-*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b1620;--bg2:#0f1d29;--card:#122433;--line:#22394b;--ink:#ecefe9;--mut:#98a9b5;--gold:#d2aa6a;--gold2:#ecc98f;--steel:#7ea2bb;--cite:#9ec1d8}
+*{box-sizing:border-box;margin:0;padding:0;scrollbar-width:thin;scrollbar-color:#2a4356 transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.45}
 body{display:flex;flex-direction:column}
 button{font:inherit;cursor:pointer;border:0;color:inherit;background:none}
-:focus-visible{outline:2px solid var(--teal2);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-/* ---------- header: full-frame intro, then compact 15 % strip ---------- */
-.hd{position:relative;flex:none;height:100%;overflow:hidden;background:#000;transition:height 1.1s cubic-bezier(.65,0,.25,1)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.ph.on img{animation:none}.eg.gl{animation:none}}
+
+/* ================= header: intro -> compact with tabs ================= */
+.hd{position:relative;z-index:6;flex:none;height:100%;background:#000;transition:height 1.4s cubic-bezier(.65,0,.2,1)}
 body.compact .hd{height:15%;min-height:78px}
-.hd video,.strip{position:absolute;inset:0;width:100%;height:100%}
-.hd video{object-fit:cover;object-position:center 60%;transition:opacity .8s}
-body.compact .hd video{opacity:0}
-.strip{background:var(--bg) url(../img/franja.webp) center 40%/cover no-repeat;opacity:0;transition:opacity .8s .3s;display:flex;align-items:center;padding:0 clamp(14px,3vw,30px)}
-.strip::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,19,27,.78) 28%,rgba(7,19,27,.97) 48%)}
-body.compact .strip{opacity:1}
-.strip>div{position:relative}
-.strip b{display:block;font-size:clamp(16px,3.2vw,28px);font-weight:800;line-height:1.1}
-.strip b em{font-style:normal;color:var(--teal)}
-.strip span{display:block;margin-top:4px;font-size:clamp(10.5px,1.6vw,13px);color:var(--mut)}
-.rp{position:absolute;right:10px;top:10px;z-index:3;width:32px;height:32px;border-radius:50%;background:rgba(7,19,27,.65);border:1px solid #ffffff55;color:#fff;font-size:14px}
-.skip{position:absolute;right:12px;bottom:12px;z-index:3;font-size:12.5px;padding:.35em 1em;border-radius:99px;background:rgba(7,19,27,.7);color:#fff;border:1px solid #ffffff55}
+.vw{position:absolute;inset:0;overflow:hidden}
+.vw video{width:100%;height:100%;object-fit:cover;object-position:center 60%}
+.veil{position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,22,32,.80) 30%,rgba(11,22,32,.96) 52%),linear-gradient(0deg,rgba(11,22,32,.35),rgba(11,22,32,.35));opacity:0;transition:opacity 1.2s ease}
+body.compact .veil{opacity:1}
+.hd::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity 1s 1s}
+body.compact .hd::after{opacity:.7}
+/* brand: starts centered & large, travels to the top-left corner */
+.brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(1.9);opacity:0;white-space:nowrap;text-align:center;transition:left 1.4s cubic-bezier(.65,0,.2,1),transform 1.4s cubic-bezier(.65,0,.2,1),opacity .9s .25s;pointer-events:none}
+body.compact .brand{left:clamp(14px,3vw,30px);transform:translate(0,-50%) scale(1);opacity:1;text-align:left;pointer-events:auto}
+.brand b{display:block;font-size:clamp(15px,2.1vw,22px);font-weight:800;line-height:1.1;letter-spacing:.005em}
+.brand b em{font-style:normal;color:var(--gold2)}
+.brand span{display:block;margin-top:4px;font-size:clamp(10px,1.4vw,12.5px);color:var(--mut)}
+/* tabs */
+.tabs{position:absolute;right:clamp(10px,2.4vw,26px);top:50%;transform:translateY(-50%);display:flex;gap:2px;opacity:0;transition:opacity .8s 1.1s}
+body.compact .tabs{opacity:1}
+.tabs>li{list-style:none;position:relative}
+.tb{display:flex;align-items:center;gap:6px;padding:.55em .8em;font-size:13.5px;font-weight:600;color:#dfe6e4;text-decoration:none;border-radius:8px;transition:color .25s,background .25s}
+.tb:hover,li.open>.tb{color:#fff;background:#ffffff12}
+.tb.cur{color:var(--gold2)}
+.tb svg{width:10px;height:10px;transition:transform .35s}
+li.open>.tb svg{transform:rotate(180deg)}
+.ind{position:absolute;bottom:-6px;height:2px;border-radius:2px;background:var(--gold);box-shadow:0 0 10px var(--gold);transition:left .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1);left:0;width:0}
+.dd{position:absolute;left:0;top:calc(100% + 10px);min-width:190px;padding:6px;border-radius:12px;background:rgba(15,29,41,.96);border:1px solid var(--line);box-shadow:0 20px 40px rgba(0,0,0,.5);transform-origin:50% 0;transform:perspective(700px) rotateX(-75deg);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s,visibility 0s .45s}
+li.open>.dd{transform:perspective(700px) rotateX(0);opacity:1;visibility:visible;transition-delay:0s}
+.dd a{display:block;padding:.55em .9em;border-radius:8px;font-size:13.5px;text-decoration:none;color:#dfe6e4;opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .3s,background .2s}
+li.open>.dd a{opacity:1;transform:none}
+li.open>.dd a:nth-child(1){transition-delay:.08s}li.open>.dd a:nth-child(2){transition-delay:.14s}li.open>.dd a:nth-child(3){transition-delay:.2s}li.open>.dd a:nth-child(4){transition-delay:.26s}
+.dd a:hover{background:var(--gold);color:var(--bg)}
+.bg{display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:12px;border:1px solid #ffffff40;background:rgba(11,22,32,.6);opacity:0;transition:opacity .8s 1.1s}
+body.compact .bg{opacity:1}
+.bg i{position:absolute;left:11px;right:11px;height:2px;border-radius:2px;background:#fff;transition:transform .35s,opacity .25s,top .35s}
+.bg i:nth-child(1){top:14px}.bg i:nth-child(2){top:20px}.bg i:nth-child(3){top:26px}
+.bg.x i:nth-child(1){top:20px;transform:rotate(45deg)}.bg.x i:nth-child(2){opacity:0}.bg.x i:nth-child(3){top:20px;transform:rotate(-45deg)}
+@media (max-width:960px){.tabs{display:none}.bg{display:block}}
+.rp{position:absolute;right:10px;top:10px;z-index:3;width:32px;height:32px;border-radius:50%;background:rgba(11,22,32,.65);border:1px solid #ffffff55;color:#fff;font-size:14px;transition:opacity .5s}
+body.compact .rp{opacity:0;pointer-events:none}
+.skip{position:absolute;right:12px;bottom:12px;z-index:3;font-size:12.5px;padding:.4em 1.1em;border-radius:99px;background:rgba(11,22,32,.7);color:#fff;border:1px solid #ffffff55}
 body.compact .skip{display:none}
-#pl{position:absolute;inset:0;margin:auto;width:76px;height:76px;border-radius:50%;z-index:3;font-size:28px;display:none;background:var(--teal);color:var(--bg)}
-/* ---------- stage ---------- */
-.stage{position:relative;flex:1;min-height:0;overflow:hidden;opacity:0;transition:opacity .8s .6s;background:radial-gradient(900px 420px at 80% 10%,#12384a55,transparent 70%),radial-gradient(700px 400px at 5% 100%,#e3a86914,transparent 70%)}
+#pl{position:absolute;inset:0;margin:auto;width:76px;height:76px;border-radius:50%;z-index:3;font-size:28px;display:none;background:var(--gold);color:var(--bg)}
+/* mobile drawer */
+.dr{position:absolute;left:0;right:0;top:100%;z-index:5;background:rgba(11,22,32,.97);border-bottom:1px solid var(--line);padding:6px 16px 14px;transform-origin:top;transform:perspective(900px) rotateX(-90deg);opacity:0;visibility:hidden;transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .3s,visibility 0s .5s}
+.dr.show{transform:none;opacity:1;visibility:visible;transition-delay:0s}
+.dr a,.dr .gt{display:block;padding:.7em .4em;font-size:15px;font-weight:600;text-decoration:none;border-bottom:1px solid #ffffff0f;opacity:0;transform:translateX(-14px);transition:opacity .35s,transform .35s}
+.dr.show a,.dr.show .gt{opacity:1;transform:none}
+.dr .sb{padding-left:1.2em;font-weight:500;font-size:14px;color:var(--mut)}
+.dr .cur{color:var(--gold2)}
+
+/* ================= stage ================= */
+.stage{position:relative;flex:1;min-height:0;overflow:hidden;perspective:1700px;opacity:0;transition:opacity .9s .9s;background:linear-gradient(180deg,#0e1b27,var(--bg) 70%)}
 body.compact .stage,body.compact .bar{opacity:1}
-.sc{position:absolute;inset:0;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(16px,3vw,44px);padding:clamp(14px,2.6vw,30px) clamp(16px,3.4vw,40px);opacity:0;transform:translateX(var(--dx,60px));filter:blur(8px);transition:opacity .6s ease,transform .7s cubic-bezier(.2,.7,.2,1),filter .6s ease;pointer-events:none}
+.sc{position:absolute;inset:0;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(16px,3vw,44px);padding:clamp(14px,2.4vw,28px) clamp(46px,6vw,76px);opacity:0;transform:translateX(var(--dx,70px)) rotateY(var(--ry,-10deg)) scale(.97);filter:blur(8px);transition:opacity .6s ease,transform .8s cubic-bezier(.2,.7,.2,1),filter .6s ease;pointer-events:none}
 .sc.cur{opacity:1;transform:none;filter:none;pointer-events:auto}
-.sc.out{opacity:0;transform:translateX(calc(var(--dx,60px)*-1));filter:blur(8px)}
-@media (max-width:760px){.sc{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 34%;gap:10px}}
-.tx{position:relative;min-height:0;overflow:auto;padding-right:6px;align-self:center;max-height:100%}
-.no{position:absolute;right:0;top:-8px;font-size:clamp(70px,12vw,130px);font-weight:900;line-height:1;color:#2fd1c512;pointer-events:none}
-.tx h2{position:relative;font-size:clamp(20px,3.1vw,31px);line-height:1.15;font-weight:800;padding-bottom:10px;max-width:90%}
-.tx h2::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;border-radius:2px;background:linear-gradient(90deg,var(--teal),var(--kraft));transition:width 1s ease .3s}
-.sc.cur h2::after{width:72px}
-.tx p{margin-top:.85em;font-size:var(--fs,clamp(14px,1.75vw,16.5px));line-height:1.65;color:#d6e4e8}
-.w{display:inline-block;white-space:pre;opacity:0;transform:translateY(9px);filter:blur(5px);transition:opacity .35s,transform .35s,filter .35s}
+.sc.out{opacity:0;transform:translateX(calc(var(--dx,70px)*-1)) rotateY(calc(var(--ry,-10deg)*-1)) scale(.97);filter:blur(8px)}
+.tx{position:relative;min-height:0;overflow:auto;padding-right:8px;align-self:center;max-height:100%}
+.tx h2{position:relative;font-size:clamp(20px,3vw,30px);line-height:1.18;font-weight:800;padding-bottom:12px}
+.tx h2::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:0;background:linear-gradient(90deg,var(--gold),transparent);transition:width 1.2s ease .3s}
+.sc.cur h2::after{width:120px}
+.tx p{margin-top:.85em;font-size:var(--fs,clamp(14px,1.75vw,16.5px));line-height:1.68;color:#d9e0e2}
+.w{display:inline-block;white-space:pre;opacity:0;transform:translateY(8px);filter:blur(5px);transition:opacity .35s,transform .35s,filter .35s}
 .w.on{opacity:1;transform:none;filter:none}
-.w.k.on{color:var(--teal2);font-weight:700}
+.w.k.on{color:var(--gold2);font-weight:700}
+.w.c.on{color:var(--cite)}
 .go{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .6s,transform .6s}
 .done .go{opacity:1;transform:none}
-.chip{display:inline-block;text-decoration:none;font-weight:700;font-size:13px;color:var(--bg);background:var(--teal);border-radius:99px;padding:.45em 1.1em;transition:transform .2s,background .2s}
-.chip:hover{background:var(--teal2);transform:translateY(-2px)}
-.chip.off{opacity:.35;pointer-events:none}
-/* media */
-.md{position:relative;min-height:0;display:grid;gap:12px;grid-auto-rows:minmax(0,1fr);align-content:center}
-.ph{position:relative;overflow:hidden;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.45);opacity:0;transform:scale(.93) translateY(18px) rotate(var(--r,0deg));clip-path:inset(0 0 100% 0 round 16px);transition:opacity .7s,transform .9s cubic-bezier(.2,.8,.2,1),clip-path .9s cubic-bezier(.2,.8,.2,1)}
-.ph.on{opacity:1;transform:rotate(var(--r,0deg));clip-path:inset(0 0 0 0 round 16px)}
-.ph img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02)}
-.ph.on img{animation:kb 14s ease-out both}
-@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.1)}}
-.ph.ct img{object-fit:contain;animation:none}
-.cap{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 6px;font-size:10.5px;color:#fff;background:linear-gradient(transparent,rgba(7,19,27,.85))}
+.chip{display:inline-block;text-decoration:none;font-weight:600;font-size:13px;color:var(--bg);background:var(--gold);border-radius:99px;padding:.45em 1.1em;transition:transform .2s,background .2s}
+.chip:hover{background:var(--gold2);transform:translateY(-2px)}
+.chip.off{opacity:.45}
+/* figures (APA 7 caption: Figura N bold, title italic, Nota italic) */
+.md{position:relative;min-height:0;display:flex;flex-direction:column;gap:12px;justify-content:center;perspective:1100px}
+.fg{position:relative;min-height:0;flex:1 1 0;display:flex;flex-direction:column;opacity:0;transform:rotateY(-38deg) translateX(-24px);transform-origin:left center;transition:opacity .8s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.fg.on{opacity:1;transform:none}
+.fg .im{flex:1;min-height:0;overflow:hidden;border-radius:10px;background:var(--card);border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.4)}
+.fg img{width:100%;height:100%;object-fit:cover;display:block}
+.fg.ct img{object-fit:contain;background:#f4f7f8}
+.fg.on img{animation:kb 16s ease-out both}
+.fg.ct.on img{animation:none}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.06)}}
+.fg figcaption{flex:none;margin-top:6px;font-size:11px;line-height:1.35;color:var(--mut)}
+.fg figcaption b{color:var(--ink);font-weight:700}
+.fg figcaption .t{display:block;font-style:italic;color:#cfd8dc}
+.fg figcaption i.n{font-style:italic}
+.fg svg{width:100%;height:100%;display:block}
+.fg.sv .im{background:#0f1f2d}
+/* escala 3D */
+.stp{opacity:0;transform:translateY(34px);transition:opacity .7s,transform .9s cubic-bezier(.2,.8,.2,1)}
+.stp.on{opacity:1;transform:none}
 .nv{display:grid;gap:10px;align-content:center;opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s}
 .done .nv{opacity:1;transform:none}
-.nv .chip{font-size:15px;padding:.7em 1.2em;text-align:center;background:var(--card);color:var(--ink);border:1px solid var(--line)}
-.nv .chip:hover{border-color:var(--teal);background:#143448}
-/* bottom bar */
-.bar{flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;padding:8px clamp(14px,3vw,30px) 9px;border-top:1px solid var(--line);background:#06101700;background:#071720;opacity:0;transition:opacity .7s .7s;font-size:12.5px}
-.ct{display:flex;align-items:center;gap:10px}
-.ar{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:16px;line-height:1}
-.ar:hover:not(:disabled){border-color:var(--teal);color:var(--teal2)}
-.ar:disabled{opacity:.3;cursor:default}
-.dots{display:flex;gap:7px}
-.dots button{width:9px;height:9px;border-radius:50%;background:#2b4c5e;transition:all .3s}
-.dots button.on{width:26px;border-radius:5px;background:var(--teal)}
-.lk{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.lk span{color:var(--mut)}
-.lk a,.cr{color:var(--teal2);border:1px solid #2fd1c555;border-radius:99px;padding:.22em .8em;text-decoration:none;font-weight:600;font-size:12px}
-.lk a:hover,.cr:hover{background:var(--teal);color:var(--bg)}
-.lk a.off{opacity:.4;pointer-events:none}
-@media (max-width:760px){.lk{display:none}.bar{justify-content:center}}
+.nv .chip{font-size:15px;padding:.75em 1.2em;text-align:center;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.nv .chip:hover{border-color:var(--gold);background:#17303f}
+/* edge arrows */
+.eg{position:absolute;top:50%;z-index:4;width:46px;height:46px;margin-top:-23px;border-radius:50%;border:1px solid #ffffff55;background:rgba(18,36,51,.5);color:#fff;font-size:24px;line-height:1;opacity:.28;transition:opacity .3s,background .3s,transform .3s}
+.eg:hover:not(:disabled){opacity:1;background:rgba(210,170,106,.9);color:var(--bg);transform:scale(1.08)}
+.eg:disabled{opacity:.08;cursor:default}
+#pv{left:clamp(6px,1.4vw,16px)}#nt{right:clamp(6px,1.4vw,16px)}
+.eg.gl{animation:glow 1.6s ease-out 1}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(236,201,143,0)}35%{opacity:1;box-shadow:0 0 26px 8px rgba(236,201,143,.65);border-color:var(--gold2)}100%{box-shadow:0 0 0 0 rgba(236,201,143,0)}}
+@media (max-width:760px){
+ .sc{display:block;overflow-y:auto;scrollbar-width:none;padding:14px 16px 76px;perspective:none}
+ .sc::-webkit-scrollbar{display:none}
+ .tx{overflow:visible;max-height:none;padding:0}
+ .md{margin-top:18px;gap:16px}
+ .fg{flex:none}.fg .im{flex:none;aspect-ratio:16/10}.fg.sv .im{aspect-ratio:4/3}.fg.wm .im{aspect-ratio:2.1/1}
+ .eg{top:auto;bottom:12px;margin-top:0;width:44px;height:44px;opacity:.5}
+ #pv{left:14px}#nt{right:14px}
+}
+/* ================= bottom: scrollable section track + footer ================= */
+.bar{flex:none;background:#08121b;border-top:1px solid var(--line);opacity:0;transition:opacity .8s 1.1s;padding:8px 0 7px}
+.trw{position:relative;padding:0 clamp(12px,3vw,30px)}
+.trk{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:2px 24px 8px;margin:0 -12px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent);cursor:grab}
+.trk::-webkit-scrollbar{display:none}
+.trk.dg{cursor:grabbing;scroll-snap-type:none}
+.pl{flex:none;scroll-snap-align:center;position:relative;overflow:hidden;font-size:12.5px;font-weight:600;color:var(--mut);padding:.45em 1.1em;border-radius:99px;border:1px solid var(--line);background:var(--bg2);transition:color .3s,border-color .3s,background .3s,transform .3s}
+.pl:hover{color:#fff;border-color:var(--steel);transform:translateY(-2px) perspective(300px) rotateX(10deg)}
+.pl.on{color:var(--bg);background:var(--gold);border-color:var(--gold)}
+.pl.on::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);animation:sh 2.6s ease-in-out infinite}
+@keyframes sh{0%,35%{left:-60%}75%,100%{left:130%}}
+.pl.dn{color:var(--gold2);border-color:#d2aa6a66}
+.prg{position:absolute;left:clamp(12px,3vw,30px);right:clamp(12px,3vw,30px);bottom:3px;height:2px;background:#1a2f3f;border-radius:2px;overflow:hidden}
+.prg i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--steel),var(--gold));transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.ft{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 14px;padding:6px clamp(14px,3vw,30px) 0;font-size:10.8px;line-height:1.35;color:var(--mut)}
+.ft p{flex:1 1 420px}
+.cr{flex:none;color:var(--gold2);border:1px solid #d2aa6a66;border-radius:99px;padding:.25em .9em;font-size:12px;font-weight:600;transition:background .2s,color .2s}
+.cr:hover{background:var(--gold);color:var(--bg)}
 /* credits overlay */
-.ov{position:absolute;inset:0;z-index:5;background:rgba(5,14,20,.96);padding:clamp(16px,3vw,34px);overflow:auto;display:none}
+.ov{position:absolute;inset:0;z-index:8;background:rgba(6,13,19,.97);padding:clamp(16px,3vw,34px);overflow:auto;display:none}
 .ov.show{display:block}
 .ov h2{font-size:20px}
-.ov p{margin-top:.8em;font-size:13.5px;line-height:1.6;color:#d6e4e8;padding-left:2em;text-indent:-2em}
+.ov p{margin-top:.8em;font-size:13.5px;line-height:1.6;color:#d9e0e2;padding-left:2em;text-indent:-2em}
 .ov .n{margin-top:1.2em;font-size:12.5px;color:var(--mut);max-width:70ch;padding:0;text-indent:0}
 .ov button{position:sticky;float:right;top:0;border:1px solid var(--line);border-radius:99px;padding:.3em 1em;background:var(--card)}
 .sr{position:absolute;left:-9999px}
 </style></head><body>
 <header class="hd" id="hd">
- <video id="v" muted playsinline preload="auto" poster="../../portada/poster.webp" aria-hidden="true"><source src="../../portada/intro.mp4" type="video/mp4"></video>
- <div class="strip"><div><b>Gestión de <em>inventarios</em> en MYPES</b><span>Equipo Nexus · Herramientas virtuales para el aprendizaje · 2026-2</span></div></div>
+ <div class="vw"><video id="v" muted playsinline preload="auto" poster="../../portada/poster.webp" aria-hidden="true"><source src="../../portada/intro.mp4" type="video/mp4"></video><div class="veil"></div></div>
  <h1 class="sr">Gestión de inventarios y herramientas digitales en las micro y pequeñas empresas (MYPES)</h1>
+ <div class="brand" id="bd"><b>Gestión de <em>inventarios</em> en MYPES</b><span>Equipo Nexus · Herramientas virtuales para el aprendizaje · 2026-2</span></div>
+ <ul class="tabs" id="tb" aria-label="Páginas del sitio"></ul>
+ <button class="bg" id="bg" aria-label="Abrir menú" aria-expanded="false"><i></i><i></i><i></i></button>
  <button class="rp" id="rp" aria-label="Repetir introducción" title="Repetir introducción">↻</button>
  <button class="skip" id="sk">Saltar introducción</button>
  <button id="pl" aria-label="Reproducir introducción">▶</button>
+ <nav class="dr" id="dr" aria-label="Páginas del sitio"></nav>
 </header>
-<main class="stage" id="sg" aria-live="polite"></main>
-<nav class="bar" id="br" aria-label="Navegación">
- <div class="lk" id="lk"></div>
- <div class="ct"><button class="ar" id="pv" aria-label="Anterior">‹</button><div class="dots" id="dt"></div><button class="ar" id="nt" aria-label="Siguiente">›</button></div>
- <button class="cr" id="cr">Créditos de imágenes</button>
-</nav>
+<main class="stage" id="sg" aria-live="polite">
+ <button class="eg" id="pv" aria-label="Párrafo anterior">‹</button>
+ <button class="eg" id="nt" aria-label="Párrafo siguiente">›</button>
+</main>
+<footer class="bar" id="br">
+ <div class="trw"><div class="trk" id="tk" aria-label="Secciones de la presentación"></div></div>
+ <div class="prg" aria-hidden="true"><i id="pg"></i></div>
+ <div class="ft"><p id="ftx"></p><button class="cr" id="cr">Créditos de imágenes</button></div>
+</footer>
 <div class="ov" id="ov" role="dialog" aria-label="Créditos de imágenes"><button id="cx">Cerrar ✕</button><div id="cl"></div></div>
 <script>
 /* ===== EDIT HERE: texts, images and Google Sites page addresses =====
-   In the texts: [[word ... word]] = highlighted phrase ; §N before a word = image N appears at that word. */
+   [[word ... word]] = highlighted phrase · <<...>> = in-text citation · §N before a word = figure/step N appears at that word */
 var PAGES=[ /* paste each published page address in url */
- {t:"Presentación",url:""},
- {t:"Contenido académico",url:""},
+ {t:"Presentación",url:"",cur:1},
+ {t:"Contenido académico",url:"",sub:[{t:"Natali",url:""},{t:"Franluis",url:""},{t:"Fabio",url:""},{t:"Marghiory",url:""}]},
  {t:"Aprendizaje colaborativo",url:""},
  {t:"Conclusiones",url:""},
  {t:"Autoría",url:""}];
-var IMG={ /* a = author (APA), d = date (APA, Spanish), t = title, lic = license, u = Commons page */
- mercado:{a:"Anthu0811",c:"Anthu0811 (2025)",d:"2025, 14 de agosto",t:"Puestos variados en el Mercado N°1 de Tocache, Perú (2025)",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:Puestos_variados_en_el_Mercado_N%C2%B01_de_Tocache,_Per%C3%BA_(2025).jpg"},
- wms:{a:"Vatumalae, V., Rajagopal, P., & Veera Pandiyan, K. S.",c:"Vatumalae et al. (2020)",d:"2020, agosto",t:"Typical features of a Warehouse Management System",lic:"CC BY 4.0",u:"https://commons.wikimedia.org/wiki/File:Typical_features_of_a_Warehouse_Management_System.png",fit:"ct"},
- exceso:{a:"PattayaPatrol",c:"PattayaPatrol (2025)",d:"2025, 24 de febrero",t:"DSC 9549 A cluttered warehouse aisle filled with stacked boxes piles of cardboard and various tools and supplies stretching into the dim interior",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:DSC_9549_A_cluttered_warehouse_aisle_filled_with_stacked_boxes_piles_of_cardboard_and_various_tools_and_supplies_stretching_into_the_dim_interior.jpg"},
- fruta:{a:"Anthu0811",c:"Anthu0811 (2025)",d:"2025, 14 de agosto",t:"Puesto de frutas en el Mercado N°1 de Tocache, Perú (2025)",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:Puesto_de_frutas_en_el_Mercado_N%C2%B01_de_Tocache,_Per%C3%BA_(2025).jpg"},
- barras:{a:"Lenkowski, A.",c:"Lenkowski (2015)",d:"2015, 9 de abril",t:"HDWR HD2000 Wireless Barcode Reader",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:HDWR_HD2000_Wireless_Barcode_Reader.png",fit:"ct"},
- rfid:{a:"Anonymous Agent",c:"Anonymous Agent (2021)",d:"2021, 16 de abril",t:"13.56MHz RFID tags",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:13.56MHz_RFID_tags.jpg"},
- notas:{a:"Shixart1985",c:"Shixart1985 (2026)",d:"2026, 7 de junio",t:"Person writing in a notebook while sitting at a desk",lic:"CC BY 2.0",u:"https://commons.wikimedia.org/wiki/File:Person_writing_in_a_notebook_while_sitting_at_a_desk.jpg"}
+var FOOT="© 2026 Equipo Nexus. Este sitio se publica bajo una licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional (CC BY-SA 4.0). Las imágenes y los textos de terceros conservan sus propias licencias.";
+var UPDATED="27 de noviembre de 2026";
+var IMG={ /* a/d/t/lic/u = APA credit data ; c = short caption ; fig = APA figure number (only for figures cited in the text) ; ft = figure title ; fit:'ct' = show whole image */
+ mercado:{a:"Anthu0811",c:"Foto: Anthu0811 (2025), CC BY-SA 4.0",d:"2025, 14 de agosto",t:"Puestos variados en el Mercado N°1 de Tocache, Perú (2025)",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:Puestos_variados_en_el_Mercado_N%C2%B01_de_Tocache,_Per%C3%BA_(2025).jpg"},
+ wms:{a:"Vatumalae, V., Rajagopal, P., & Veera Pandiyan, K. S.",d:"2020, agosto",t:"Typical features of a Warehouse Management System",lic:"CC BY 4.0",u:"https://commons.wikimedia.org/wiki/File:Typical_features_of_a_Warehouse_Management_System.png",fit:"ct",cls:"wm",fig:1,ft:"Características típicas de un sistema de gestión de almacenes",nota:"Adaptado de <i>Typical features of a Warehouse Management System</i> [Imagen], por V. Vatumalae, P. Rajagopal y K. S. Veera Pandiyan, 2020, Wikimedia Commons (CC BY 4.0)."},
+ exceso:{a:"PattayaPatrol",c:"Foto: PattayaPatrol (2025), CC BY-SA 4.0",d:"2025, 24 de febrero",t:"DSC 9549 A cluttered warehouse aisle filled with stacked boxes piles of cardboard and various tools and supplies stretching into the dim interior",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:DSC_9549_A_cluttered_warehouse_aisle_filled_with_stacked_boxes_piles_of_cardboard_and_various_tools_and_supplies_stretching_into_the_dim_interior.jpg"},
+ fruta:{a:"Anthu0811",c:"Foto: Anthu0811 (2025), CC BY-SA 4.0",d:"2025, 14 de agosto",t:"Puesto de frutas en el Mercado N°1 de Tocache, Perú (2025)",lic:"CC BY-SA 4.0",u:"https://commons.wikimedia.org/wiki/File:Puesto_de_frutas_en_el_Mercado_N%C2%B01_de_Tocache,_Per%C3%BA_(2025).jpg"},
+ notas:{a:"Shixart1985",c:"Foto: Shixart1985 (2026), CC BY 2.0",d:"2026, 7 de junio",t:"Person writing in a notebook while sitting at a desk",lic:"CC BY 2.0",u:"https://commons.wikimedia.org/wiki/File:Person_writing_in_a_notebook_while_sitting_at_a_desk.jpg"}
 };
 var S=[
- {t:"Problema general",im:["mercado","wms"],
-  x:["En Perú, las pequeñas y micro empresas (MYPE) §0representan el [[99,1 %]] de las 2,34 millones de empresas formales registradas en 2024 y aportan el [[20,2 %]] del PBI (Ministerio de la Producción [PRODUCE], 2025). Sin embargo, la importancia de sus inventarios varía considerablemente, al igual que la forma en que la mayoría de estos negocios gestionan sus existencias: recurriendo a pequeños libros de registro, hojas de cálculo sin actualizar o, simplemente, a la memoria del propietario.",
+ {t:"Problema general",s:"Problema general",im:["mercado","wms"],
+  x:["En Perú, las pequeñas y micro empresas (MYPE) §0representan el [[99,1 %]] de las 2,34 millones de empresas formales registradas en 2024 y aportan el [[20,2 %]] del PBI <<(Ministerio de la Producción [PRODUCE], 2025)>>. Sin embargo, la importancia de sus inventarios varía considerablemente, al igual que la forma en que la mayoría de estos negocios gestionan sus existencias: recurriendo a pequeños libros de registro, hojas de cálculo sin actualizar o, simplemente, a la memoria del propietario.",
      "El resultado es un problema silencioso de [[doble vertiente]]: por un lado, los productos se acumulan, inmovilizando capital; por otro, la escasez provoca la pérdida de ventas y de clientes. Este sitio web analiza las causas fundamentales de este desequilibrio y §1explora diversas herramientas, desde software local básico hasta tecnología RFID, que pueden contribuir a ofrecer una solución."]},
- {t:"Resumen de la problemática",im:["exceso"],
+ {t:"Resumen de la problemática",s:"Resumen",im:["exceso"],
   x:["En el Perú, las micro y pequeñas empresas (MYPE) constituyen el 99,1 % del sector empresarial formal y aportan el 20,2 % al PIB nacional; sin embargo, la mayoría gestiona sus inventarios de manera informal, ya sea mediante pequeños cuadernos de registro, sistemas manuales obsoletos o, simplemente, confiando en la memoria. Esta falta de control genera un [[doble problema]]: un §0[[exceso de inventario]] que inmoviliza capital, e ineficiencias que derivan en la [[pérdida de ventas]] y de clientes.",
      "Por consiguiente, este sitio analiza las causas del desequilibrio y explora diversas soluciones, que van desde aplicaciones de software hasta tecnología RFID."]},
- {t:"Importancia del tema de investigación",im:["fruta"],
-  x:["El estudio de este tema es importante porque el inventario suele ser uno de los activos más valiosos para una micro, pequeña o mediana empresa (MYPES); sin embargo, es a su vez, uno de los [[menos controlados]]. Rivero Sánchez et al. (2026) sostienen que la gestión eficiente de las existencias ya no es una mera tarea operativa, sino un [[factor estratégico]] del cual dependen la supervivencia y el desarrollo de una organización (p. 17).",
-     "Esta afirmación cobra aún mayor relevancia en el Perú, donde las MYPES §0representan el [[86,5 %]] del empleo en el sector privado (PRODUCE, 2025). Cuando una MYPE pierde dinero debido a una deficiente planificación de las adquisiciones o a la caducidad de sus productos, no solo están en juego sus beneficios, sino también los puestos de trabajo que sostiene. Por consiguiente, comprender cómo se controla el inventario resulta fundamental para entender la sostenibilidad de la economía nacional."]},
- {t:"Arquitectura del sitio",im:["barras","rfid"],links:true,
-  x:["Esta sección representa una parte del recorrido desde el problema hasta la solución, y abarca cuatro temas que conforman una «[[escala de madurez digital]]» (Figura 2). En el apartado «Contenido académico», Natali analiza el estado inicial, la fiabilidad de los registros, sin el cual no es posible realizar un trabajo significativo; Fabio explica cómo la clasificación ABC ayuda a identificar los activos que requieren una gestión adecuada; Marghiory demuestra por qué una base de datos compartida, que abarca desde niveles básicos hasta avanzados, constituye el primer paso idóneo hacia la digitalización; y Franluis presenta la etapa: software basado en la nube, §0códigos de barras y §1tecnología RFID.",
+ {t:"Importancia del tema de investigación",s:"Importancia",im:["fruta"],
+  x:["El estudio de este tema es importante porque el inventario suele ser uno de los activos más valiosos para una micro, pequeña o mediana empresa (MYPES); sin embargo, es a su vez, uno de los [[menos controlados]]. <<Rivero Sánchez et al. (2026)>> sostienen que la gestión eficiente de las existencias ya no es una mera tarea operativa, sino un [[factor estratégico]] del cual dependen la supervivencia y el desarrollo de una organización <<(p. 17)>>.",
+     "Esta afirmación cobra aún mayor relevancia en el Perú, donde las MYPES §0representan el [[86,5 %]] del empleo en el sector privado <<(PRODUCE, 2025)>>. Cuando una MYPE pierde dinero debido a una deficiente planificación de las adquisiciones o a la caducidad de sus productos, no solo están en juego sus beneficios, sino también los puestos de trabajo que sostiene. Por consiguiente, comprender cómo se controla el inventario resulta fundamental para entender la sostenibilidad de la economía nacional."]},
+ {t:"Arquitectura del sitio",s:"Arquitectura",fig:"escala",links:true,
+  x:["Esta sección representa una parte del recorrido desde el problema hasta la solución, y abarca cuatro temas que conforman una «[[escala de madurez digital]]» (Figura 2). En el apartado «Contenido académico», §0Natali analiza el estado inicial, la fiabilidad de los registros, sin el cual no es posible realizar un trabajo significativo; §1Fabio explica cómo la clasificación ABC ayuda a identificar los activos que requieren una gestión adecuada; §2Marghiory demuestra por qué una base de datos compartida, que abarca desde niveles básicos hasta avanzados, constituye el primer paso idóneo hacia la digitalización; y §3Franluis presenta la etapa: software basado en la nube, códigos de barras y tecnología RFID.",
      "Asimismo, la sección titulada «Aprendizaje colaborativo» aborda el proceso de trabajo en equipo; «Resultados» resume la respuesta de cada integrante ante el problema; y «Autoría» identifica a los creadores del trabajo."]},
- {t:"Limitaciones del equipo",im:["notas"],
+ {t:"Limitaciones del equipo",s:"Limitaciones",im:["notas"],
   x:["Este trabajo presenta ciertas limitaciones que cabe señalar. En primer lugar, §0se basa en una [[revisión bibliográfica]] y no en trabajo de campo; el equipo no analizó directamente los registros de ninguna micro, pequeña o mediana empresa (MYPES). En segundo lugar, algunas fuentes provienen de contextos diversos —como un informe del Ministerio de Economía, Industria y Comercio de Costa Rica o un estudio realizado en una cadena minorista extranjera—, lo que implica que sus hallazgos deben interpretarse con cautela antes de aplicarlos al contexto peruano.",
      "Por último, el equipo trabajó de forma remota y bajo estrictas limitaciones de tiempo, lo que obligó a centrarse en fuentes de fácil acceso. No obstante, [[cada referencia ha sido verificada]] con su documento original."]},
- {t:"Elige por dónde seguir",nav:true,im:[],
+ {t:"Elige por dónde seguir",s:"Continuar",nav:true,
   x:["Ya conoces el problema, por qué importa, cómo está organizado este sitio y dónde están sus límites. Ahora puedes entrar al [[contenido académico]], ver el trabajo en equipo, leer las conclusiones o conocer a los autores."]}
 ];
+var ESC=[["Natali","Fiabilidad de los","registros"],["Fabio","Clasificación","ABC"],["Marghiory","Base de datos","compartida"],["Franluis","Nube, códigos de","barras y RFID"]];
 var NOTE="Imágenes tomadas de Wikimedia Commons y usadas bajo sus licencias Creative Commons: se indican autoría, licencia y enlace de origen. Solo se redimensionaron para la web; no se alteró su contenido. Las licencias CC BY-SA exigen compartir las adaptaciones con la misma licencia, por eso este sitio se publica bajo CC BY-SA 4.0. Los textos y las imágenes de terceros conservan sus propias licencias.";
 /* ================================================================ */
-var $=function(i){return document.getElementById(i)},cur=-1,TM=null,W=[],TRG={},wi=0,curEl=null,v=$('v');
-var rm=matchMedia('(prefers-reduced-motion:reduce)').matches,Q=location.search;
-function compact(){document.body.classList.add('compact');v.pause();if(cur<0)show(+(/[?&]s=(\d)/.exec(Q)||[0,0])[1],1)}
-function intro(){document.body.classList.remove('compact');$('pl').style.display='none';
+var $=function(i){return document.getElementById(i)},cur=-1,TM=null,W=[],TRG={},wi=0,curEl=null,GT=null,v=$('v'),Q=location.search,mob=function(){return innerWidth<=760};
+/* ---------- header: intro -> compact ---------- */
+function toEnd(){try{if(v.duration)v.currentTime=Math.max(0,v.duration-.04)}catch(e){}}
+function compact(){if(document.body.classList.contains('compact'))return;document.body.classList.add('compact');v.pause();toEnd();setTimeout(function(){if(cur<0)show(+(/[?&]s=(\d)/.exec(Q)||[0,0])[1],1)},1500)}
+function intro(){closeMenus();document.body.classList.remove('compact');$('pl').style.display='none';v.poster="../../portada/poster.webp";
  try{v.currentTime=0;var p=v.play();if(p&&p.catch)p.catch(function(){$('pl').style.display='block'})}catch(e){}}
-v.addEventListener('ended',compact);$('sk').onclick=compact;$('rp').onclick=intro;
-$('pl').onclick=function(){$('pl').style.display='none';v.play()};
-function links(cls){return PAGES.map(function(p){return p.url?'<a class="chip" href="'+p.url+'" target="_top">'+p.t+'</a>':'<a class="chip off" aria-disabled="true">'+p.t+'</a>'}).join('')}
+v.addEventListener('ended',function(){setTimeout(compact,500)});
+$('sk').onclick=compact;$('rp').onclick=intro;$('pl').onclick=function(){$('pl').style.display='none';v.play()};
+/* ---------- tabs (Sites-style, animated) ---------- */
+var arrow='<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+function A(p,cls){return p.url?'<a class="'+cls+'" href="'+p.url+'" target="_top">'+p.t+'</a>':'<a class="'+cls+'" role="link" aria-disabled="true" title="Enlace pendiente">'+p.t+'</a>'}
+var tb=$('tb'),ind=document.createElement('i');ind.className='ind';
+PAGES.forEach(function(p){var li=document.createElement('li');
+ li.innerHTML=p.sub?'<a class="tb" role="button" tabindex="0" aria-haspopup="true">'+p.t+arrow+'</a><div class="dd">'+p.sub.map(function(s){return A(s,'')}).join('')+'</div>':A(p,'tb'+(p.cur?' cur':''));
+ if(p.sub){var t=li.firstChild;t.onclick=function(e){e.stopPropagation();var o=li.classList.contains('open');closeMenus();if(!o)li.classList.add('open')};
+  li.onmouseenter=function(){if(matchMedia('(hover:hover)').matches){closeMenus();li.classList.add('open')}};li.onmouseleave=function(){li.classList.remove('open')}}
+ tb.appendChild(li)});
+tb.appendChild(ind);
+function moveInd(el){if(!el)return;var r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();ind.style.left=(r.left-b.left+10)+'px';ind.style.width=(r.width-20)+'px'}
+function homeInd(){moveInd(tb.querySelector('.tb.cur'))}
+[].forEach.call(tb.querySelectorAll('.tb'),function(a){a.addEventListener('mouseenter',function(){moveInd(a)});a.addEventListener('mouseleave',homeInd)});
+tb.addEventListener('mouseleave',homeInd);addEventListener('resize',homeInd);setTimeout(homeInd,2000);
+function closeMenus(){[].forEach.call(tb.querySelectorAll('li.open'),function(l){l.classList.remove('open')});$('dr').classList.remove('show');$('bg').classList.remove('x')}
+document.addEventListener('click',function(e){if(!e.target.closest('.tabs,.dr,.bg'))closeMenus()});
+var dr=$('dr');dr.innerHTML=PAGES.map(function(p,i){return p.sub?'<span class="gt" style="transition-delay:'+(i*.05+.1)+'s">'+p.t+'</span>'+p.sub.map(function(s,k){return A(s,'sb').replace('<a ','<a style="transition-delay:'+(i*.05+.15+k*.04)+'s" ')}).join(''):A(p,p.cur?'cur':'').replace('<a ','<a style="transition-delay:'+(i*.05+.1)+'s" ')}).join('');
+$('bg').onclick=function(e){e.stopPropagation();var o=dr.classList.toggle('show');$('bg').classList.toggle('x',o);$('bg').setAttribute('aria-expanded',o)};
+/* ---------- scene builder ---------- */
+function fig(k,j){var d=IMG[k],f=document.createElement('figure'),n=d.fig;
+ f.className='fg rv'+(d.fit=='ct'?' ct':'')+(d.cls?' '+d.cls:'');
+ f.innerHTML='<div class="im"><img src="../img/'+k+'.webp" alt="'+d.t+'"></div><figcaption>'+(n?'<b>Figura '+n+'</b><span class="t">'+d.ft+'</span><i class="n">Nota.</i> '+d.nota:d.c)+'</figcaption>';return f}
+function escala(){var f=document.createElement('figure');f.className='fg sv on';var s='';
+ ESC.forEach(function(e,i){var x=22+i*92,h=46+i*40,y=250-h,dx=32,dy=-17;
+  s+='<g class="stp rv"><polygon points="'+x+','+y+' '+(x+60)+','+y+' '+(x+60)+',250 '+x+',250" fill="#1c3a50"/><polygon points="'+(x+60)+','+y+' '+(x+60+dx)+','+(y+dy)+' '+(x+60+dx)+','+(250+dy)+' '+(x+60)+',250" fill="#14293a"/><polygon points="'+x+','+y+' '+(x+dx)+','+(y+dy)+' '+(x+60+dx)+','+(y+dy)+' '+(x+60)+','+y+'" fill="'+(i==3?'#e6c58d':'#d2aa6a')+'"/>'+
+  '<text x="'+(x+30)+'" y="'+(y+22)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ecefe9">'+e[0]+'</text><text x="'+(x+30)+'" y="'+(y+36)+'" text-anchor="middle" font-size="8" fill="#b9c8d1">'+e[1]+'</text><text x="'+(x+30)+'" y="'+(y+46)+'" text-anchor="middle" font-size="8" fill="#b9c8d1">'+e[2]+'</text></g>'});
+ f.innerHTML='<div class="im"><svg viewBox="0 44 420 222" role="img" aria-label="Escalera de cuatro peldaños que representa la escala de madurez digital: fiabilidad de los registros, clasificación ABC, base de datos compartida y nube con códigos de barras y RFID"><line x1="14" y1="252" x2="406" y2="252" stroke="#2a4356"/>'+s+'<text x="14" y="62" font-size="9" fill="#98a9b5" letter-spacing=".1em">MADUREZ DIGITAL →</text></svg></div><figcaption><b>Figura 2</b><span class="t">Escala de madurez digital</span><i class="n">Nota.</i> Elaboración propia.</figcaption>';return f}
 function build(i){var s=S[i],el=document.createElement('section');el.className='sc';
- var tx=document.createElement('div');tx.className='tx';
- tx.innerHTML='<span class="no">0'+(i+1)+'</span><h2>'+s.t+'</h2>';
+ var tx=document.createElement('div');tx.className='tx';tx.innerHTML='<h2>'+s.t+'</h2>';
  W=[];TRG={};var n=0;
- s.x.forEach(function(p){var pe=document.createElement('p'),hl=false;
+ s.x.forEach(function(p){var pe=document.createElement('p'),hl=false,ci=false;
   p.split(/\s+/).forEach(function(tok){var m=/^§(\d)(.*)$/.exec(tok);if(m){TRG[n]=+m[1];tok=m[2]}
-   if(tok.indexOf('[[')>=0){hl=true;tok=tok.replace('[[','')}var end=false;if(tok.indexOf(']]')>=0){end=true;tok=tok.replace(']]','')}
-   var w=document.createElement('span');w.className='w'+(hl?' k':'');w.textContent=tok+' ';pe.appendChild(w);W.push(w);n++;if(end)hl=false});
+   if(tok.indexOf('[[')>=0){hl=true;tok=tok.replace('[[','')}var he=false;if(tok.indexOf(']]')>=0){he=true;tok=tok.replace(']]','')}
+   if(tok.indexOf('<<')>=0){ci=true;tok=tok.replace('<<','')}var ce=false;if(tok.indexOf('>>')>=0){ce=true;tok=tok.replace('>>','')}
+   var w=document.createElement('span');w.className='w'+(hl?' k':'')+(ci?' c':'');w.textContent=tok+' ';pe.appendChild(w);W.push(w);n++;if(he)hl=false;if(ce)ci=false});
   tx.appendChild(pe)});
- if(s.links){var g=document.createElement('div');g.className='go';g.innerHTML=links();tx.appendChild(g)}
+ if(s.links){var g=document.createElement('div');g.className='go';g.innerHTML=PAGES.map(function(p){return A(p,'chip'+(p.url?'':' off'))}).join('');tx.appendChild(g)}
  var md=document.createElement('div');md.className='md';
- if(s.nav){md.className='md';md.innerHTML='<div class="nv">'+links()+'</div>'}
- else s.im.forEach(function(k,j){var d=IMG[k],ph=document.createElement('figure');ph.className='ph'+(d.fit=='ct'?' ct':'');ph.style.setProperty('--r',(s.im.length>1?(j?1.2:-1.2):0)+'deg');
-  ph.innerHTML='<img src="../img/'+k+'.webp" alt="'+d.t+'" loading="eager"><figcaption class="cap">'+d.c+' · '+d.lic+' · Wikimedia Commons</figcaption>';md.appendChild(ph)});
+ if(s.nav){md.innerHTML='<div class="nv">'+PAGES.concat(PAGES[1].sub.map(function(x){return{t:'Contenido · '+x.t,url:x.url}})).map(function(p){return p.sub?'':A(p,'chip'+(p.url?'':' off'))}).join('')+'</div>'}
+ else if(s.fig=='escala')md.appendChild(escala());
+ else s.im.forEach(function(k,j){md.appendChild(fig(k,j))});
  el.appendChild(tx);el.appendChild(md);return el}
+function fit(t){if(mob())return;var f=Math.min(16.5,Math.max(14,innerWidth*.0175));t.style.removeProperty('--fs');while(t.scrollHeight>t.clientHeight+2&&f>12.5){f-=.5;t.style.setProperty('--fs',f+'px')}}
+function follow(w){[curEl.querySelector('.tx'),curEl].forEach(function(c){if(c.scrollHeight>c.clientHeight+2){var r=w.getBoundingClientRect(),b=c.getBoundingClientRect();if(r.bottom>b.bottom-50)c.scrollTop+=r.bottom-b.bottom+90}})}
 function tick(){if(wi>=W.length){clearInterval(TM);curEl.classList.add('done');return}
- W[wi].classList.add('on');if(TRG[wi]!=null){var f=curEl.querySelectorAll('.ph')[TRG[wi]];if(f)f.classList.add('on')}
- wi++;var t=curEl.querySelector('.tx');if(t.scrollHeight>t.clientHeight)t.scrollTop=t.scrollHeight}
-function finish(){clearInterval(TM);while(wi<W.length)tick();curEl.querySelectorAll('.ph').forEach(function(f){f.classList.add('on')});curEl.classList.add('done')}
-function fit(t){var f=Math.min(16.5,Math.max(14,innerWidth*.0175));t.style.removeProperty('--fs');while(t.scrollHeight>t.clientHeight+2&&f>12.5){f-=.5;t.style.setProperty('--fs',f+'px')}}
-function show(i,instant){if(i<0||i>=S.length)return;var dir=i>=cur?1:-1,old=curEl;clearInterval(TM);
- if(old){old.style.setProperty('--dx',(60*dir)+'px');old.classList.remove('cur');old.classList.add('out');setTimeout(function(){old.remove()},800)}
- cur=i;curEl=build(i);curEl.style.setProperty('--dx',(60*dir)+'px');$('sg').appendChild(curEl);wi=0;fit(curEl.querySelector('.tx'));
+ W[wi].classList.add('on');if(TRG[wi]!=null){var f=curEl.querySelectorAll('.rv')[TRG[wi]];if(f)f.classList.add('on')}follow(W[wi]);wi++}
+function finish(){clearInterval(TM);while(wi<W.length)tick();[].forEach.call(curEl.querySelectorAll('.rv'),function(f){f.classList.add('on')});curEl.classList.add('done')}
+var Pl=[],tk=$('tk');
+S.forEach(function(s,i){var b=document.createElement('button');b.type='button';b.className='pl';b.textContent=s.s;b.onclick=function(){show(i)};tk.appendChild(b);Pl.push(b)});
+function show(i,instant){if(i<0||i>=S.length)return;var dir=i>=cur?1:-1,old=curEl;clearInterval(TM);clearTimeout(GT);
+ if(old){old.style.setProperty('--dx',(70*dir)+'px');old.style.setProperty('--ry',(-10*dir)+'deg');old.classList.remove('cur');old.classList.add('out');setTimeout(function(){old.remove()},900)}
+ cur=i;curEl=build(i);curEl.style.setProperty('--dx',(70*dir)+'px');curEl.style.setProperty('--ry',(-10*dir)+'deg');$('sg').appendChild(curEl);wi=0;fit(curEl.querySelector('.tx'));
  void curEl.offsetWidth;curEl.classList.add('cur');
- [].forEach.call($('dt').children,function(b,k){b.classList.toggle('on',k===i)});
- $('pv').disabled=i===0;$('nt').disabled=i===S.length-1;
- if(instant&&/[?&]done/.test(Q))finish();else TM=setInterval(tick,rm?15:46)}
-function next(){if(wi<W.length&&cur>=0){finish();return}show(cur+1)}
+ Pl.forEach(function(b,k){b.classList.toggle('on',k===i);b.classList.toggle('dn',k<i)});
+ var b=Pl[i];tk.scrollTo({left:b.offsetLeft-tk.clientWidth/2+b.offsetWidth/2,behavior:'smooth'});
+ $('pg').style.width=((i+1)/S.length*100)+'%';$('pv').disabled=i===0;$('nt').disabled=i===S.length-1;
+ GT=setTimeout(function(){['pv','nt'].forEach(function(id){var e=$(id);if(!e.disabled){e.classList.remove('gl');void e.offsetWidth;e.classList.add('gl');setTimeout(function(){e.classList.remove('gl')},1800)}})},2000);
+ if(instant&&/[?&]done/.test(Q))finish();else TM=setInterval(tick,46)}
+function next(){if(cur>=0&&wi<W.length){finish();return}show(cur+1)}
 function prev(){show(cur-1)}
 $('nt').onclick=next;$('pv').onclick=prev;
-document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowDown')next();if(e.key==='ArrowLeft'||e.key==='ArrowUp')prev();if(e.key==='Escape')$('ov').classList.remove('show')});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev();if(e.key==='Escape'){$('ov').classList.remove('show');closeMenus()}});
 var tx0=null;document.addEventListener('touchstart',function(e){tx0=e.touches[0].clientX},{passive:true});
-document.addEventListener('touchend',function(e){if(tx0==null)return;var d=e.changedTouches[0].clientX-tx0;tx0=null;if(Math.abs(d)>60)(d<0?next:prev)()});
-S.forEach(function(s,i){var b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Ir a: '+s.t);b.onclick=function(){show(i)};$('dt').appendChild(b)});
-$('lk').innerHTML='<span>Ir a:</span>'+PAGES.map(function(p){return p.url?'<a href="'+p.url+'" target="_top">'+p.t+'</a>':'<a class="off">'+p.t+'</a>'}).join('');
-/* credits (APA 7, image) */
+document.addEventListener('touchend',function(e){if(tx0==null)return;var d=e.changedTouches[0].clientX-tx0;tx0=null;if(Math.abs(d)>70)(d<0?next:prev)()});
+/* track: drag + wheel */
+(function(){var d=0,x0=0,s0=0,moved=0;tk.addEventListener('pointerdown',function(e){if(e.pointerType!=='mouse')return;d=1;moved=0;x0=e.clientX;s0=tk.scrollLeft});
+ addEventListener('pointermove',function(e){if(!d)return;var dx=e.clientX-x0;if(Math.abs(dx)>4){moved=1;tk.classList.add('dg')}tk.scrollLeft=s0-dx});
+ addEventListener('pointerup',function(){d=0;tk.classList.remove('dg')});
+ tk.addEventListener('click',function(e){if(moved){e.stopPropagation();e.preventDefault();moved=0}},true);
+ tk.addEventListener('wheel',function(e){if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){tk.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false})})();
+/* footer + credits (APA 7) */
+$('ftx').innerHTML=FOOT+' Última actualización: '+UPDATED+'.';
 var seen={};S.forEach(function(s){(s.im||[]).forEach(function(k){seen[k]=1})});
-$('cl').innerHTML='<h2>Créditos de imágenes</h2>'+Object.keys(seen).map(function(k){var d=IMG[k];return'<p>'+d.a+' ('+d.d+'). <i>'+d.t+'</i> [Fotografía]. Wikimedia Commons. '+d.lic+'. <a style="color:var(--teal2)" href="'+d.u+'" target="_blank" rel="noopener">'+d.u+'</a></p>'}).join('')+'<p class="n">'+NOTE+'</p>';
+$('cl').innerHTML='<h2>Créditos de imágenes</h2>'+Object.keys(seen).map(function(k){var d=IMG[k];return'<p>'+d.a+' ('+d.d+'). <i>'+d.t+'</i> [Fotografía]. Wikimedia Commons. '+d.lic+'. <a style="color:var(--gold2)" href="'+d.u+'" target="_blank" rel="noopener">'+d.u+'</a></p>'}).join('')+'<p class="n">'+NOTE+'</p>';
 $('cr').onclick=function(){$('ov').classList.add('show')};$('cx').onclick=function(){$('ov').classList.remove('show')};
-if(rm||/[?&]final/.test(Q))compact();else intro();
+/* start */
+if(/[?&]final/.test(Q)){v.addEventListener('loadedmetadata',toEnd);v.poster="../../portada/final.webp";compact()}else intro();
 </script></body></html>
