@@ -165,7 +165,7 @@ body.compact .stage,body.compact .bar{opacity:1}
 <footer class="bar" id="br">
  <div class="trw"><div class="trk" id="tk" aria-label="Secciones de la presentación"></div></div>
  <div class="prg" aria-hidden="true"><i id="pg"></i></div>
- <div class="ft"><p id="ftx"></p><span style="display:flex;gap:8px;flex:none"><button class="cr" id="fs" aria-label="Pantalla completa">⛶ Pantalla completa</button><button class="cr" id="cr">Créditos de imágenes</button></span></div>
+ <div class="ft"><p id="ftx"></p><button class="cr" id="cr">Créditos de imágenes</button></div>
 </footer>
 <div class="ov" id="ov" role="dialog" aria-label="Créditos de imágenes"><button id="cx">Cerrar ✕</button><div id="cl"></div></div>
 <script>
@@ -290,9 +290,6 @@ document.addEventListener('touchend',function(e){if(tx0==null)return;var d=e.cha
 $('ftx').innerHTML=FOOT+' Última actualización: '+UPDATED+'.';
 var seen={};S.forEach(function(s){(s.im||[]).forEach(function(k){seen[k]=1})});
 $('cl').innerHTML='<h2>Créditos de imágenes</h2>'+Object.keys(seen).map(function(k){var d=IMG[k];return'<p>'+d.a+' ('+d.d+'). <i>'+d.t+'</i> [Fotografía]. Wikimedia Commons. '+d.lic+'. <a style="color:var(--gold2)" href="'+d.u+'" target="_blank" rel="noopener">'+d.u+'</a></p>'}).join('')+'<p class="n">'+NOTE+'</p>';
-$('fs').onclick=function(){var d=document,e=d.documentElement;if(d.fullscreenElement){d.exitFullscreen();return}
- if(d.fullscreenEnabled&&e.requestFullscreen)e.requestFullscreen().catch(function(){window.open(location.href.split('#')[0],'_blank')});else window.open(location.href.split('#')[0],'_blank')};
-document.addEventListener('fullscreenchange',function(){$('fs').textContent=document.fullscreenElement?'✕ Salir de pantalla completa':'⛶ Pantalla completa'});
 $('cr').onclick=function(){$('ov').classList.add('show')};$('cx').onclick=function(){$('ov').classList.remove('show')};
 /* start */
 if(/[?&]final/.test(Q)){v.addEventListener('loadedmetadata',toEnd);v.poster="../../portada/final.webp";compact()}else intro();
