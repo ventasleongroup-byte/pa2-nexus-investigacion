@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Presentación · Equipo Nexus</title>
+<link rel="stylesheet" href="../base.css">
+<style>
+html,body{height:100%;overflow:hidden}
+body{padding:0;display:flex;flex-direction:column}
+/* ---------- header: full-frame intro, then compact strip (15 %) ---------- */
+.hd{position:relative;flex:none;height:100%;overflow:hidden;background:#000;transition:height 1s cubic-bezier(.65,0,.25,1)}
+body.compact .hd{height:15%;min-height:78px}
+.hd video,.hd .strip{position:absolute;inset:0;width:100%;height:100%}
+.hd video{object-fit:cover;object-position:center 60%;transition:opacity .8s}
+body.compact .hd video{opacity:0}
+.strip{background:#0b0906 url(../img/franja.webp) center 40%/cover no-repeat;opacity:0;transition:opacity .8s .3s;display:flex;align-items:center;padding:0 clamp(14px,3vw,28px)}
+.strip::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,9,6,.7) 28%,rgba(11,9,6,.97) 46%)}
+body.compact .strip{opacity:1}
+.strip div{position:relative}
+.strip b{display:block;font-size:clamp(16px,3.2vw,28px);font-weight:800;line-height:1.1}
+.strip b em{font-style:normal;color:var(--amber)}
+.strip span{display:block;margin-top:4px;font-size:clamp(10.5px,1.6vw,13px);color:var(--mut)}
+.ctl{position:absolute;right:10px;top:10px;display:flex;gap:6px;z-index:3}
+.ctl button{width:32px;height:32px;padding:0;border-radius:50%;background:rgba(11,9,6,.65);color:#fff;border:1px solid #ffffff55;font-size:14px}
+.skip{position:absolute;right:12px;bottom:12px;z-index:3;font-size:12.5px;padding:.35em 1em;background:rgba(11,9,6,.7);color:#fff;border:1px solid #ffffff55}
+body.compact .skip{display:none}
+#pl{position:absolute;inset:0;margin:auto;width:76px;height:76px;border-radius:50%;z-index:3;font-size:28px;display:none}
+/* ---------- body: steps + paragraph ---------- */
+.main{flex:1;min-height:0;display:grid;grid-template-columns:230px 1fr;gap:16px;padding:16px clamp(14px,3vw,28px) 8px;opacity:0;transition:opacity .7s .5s}
+body.compact .main,body.compact .bar{opacity:1}
+@media (max-width:760px){.main{grid-template-columns:1fr;gap:10px;padding-top:10px}}
+.steps{display:flex;flex-direction:column;gap:6px;overflow:auto}
+@media (max-width:760px){.steps{flex-direction:row;overflow-x:auto;padding-bottom:4px}}
+.st{flex:none;text-align:left;display:flex;gap:10px;align-items:center;background:var(--card);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:600;font-size:13.5px;transition:border-color .25s,background .25s}
+.st i{font-style:normal;flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:#241c13;color:var(--amber2)}
+.st:hover{border-color:var(--amber)}
+.st.on{border-color:var(--amber);background:#1d1610}
+.st.on i{background:var(--amber);color:var(--bg)}
+.st.done i{background:#3a2e20}
+@media (max-width:760px){.st span{display:none}.st.on span{display:inline}}
+.pn{position:relative;display:flex;flex-direction:column;min-height:0}
+.pn .txt{flex:1;min-height:0;overflow:auto;padding-right:6px}
+.pn h2{font-size:clamp(18px,2.6vw,24px);margin-top:4px}
+.pn p{margin-top:.8em;font-size:clamp(14px,1.8vw,16px);line-height:1.6}
+.pn .txt>*{animation:in .45s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+.nx{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.nx .c{font-size:12.5px;color:var(--mut)}
+.nx button:disabled{opacity:.3;cursor:default}
+.go{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.go .btn{font-size:13px;padding:.4em 1em}
+.off{opacity:.4;pointer-events:none}
+.prog{height:3px;background:var(--line);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--amber2));transition:width .5s}
+/* ---------- bottom nav ---------- */
+.bar{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px clamp(14px,3vw,28px) 10px;border-top:1px solid var(--line);background:#0f0c08;opacity:0;transition:opacity .7s .6s;font-size:12.5px}
+.bar>span{color:var(--mut);margin-right:2px}
+.bar a{color:var(--amber2);border:1px solid #ff8a1f66;border-radius:999px;padding:.25em .8em;text-decoration:none;font-weight:600}
+.bar a:hover{background:var(--amber);color:var(--bg)}
+.bar .ft{flex-basis:100%;color:var(--mut);font-size:11px;line-height:1.35}
+@media (max-width:760px){.bar .ft{display:none}}
+.sr{position:absolute;left:-9999px}
+</style></head><body>
+<header class="hd" id="hd">
+ <video id="v" muted playsinline preload="auto" poster="../../portada/poster.webp" aria-hidden="true"><source src="../../portada/intro.mp4" type="video/mp4"></video>
+ <div class="strip"><div><b>Gestión de <em>inventarios</em> en MYPES</b><span>Equipo Nexus · Herramientas virtuales para el aprendizaje · 2026-2</span></div></div>
+ <h1 class="sr">Gestión de inventarios y herramientas digitales en las micro y pequeñas empresas (MYPES)</h1>
+ <div class="ctl"><button id="rp" aria-label="Repetir introducción" title="Repetir introducción">↻</button></div>
+ <button class="skip" id="sk">Saltar introducción</button>
+ <button id="pl" aria-label="Reproducir introducción">▶</button>
+</header>
+<section class="main" id="mn">
+ <nav class="steps" id="st" aria-label="Secciones de la presentación"></nav>
+ <article class="panel pn">
+  <div class="prog"><i id="pg"></i></div>
+  <div class="txt" id="tx" aria-live="polite"></div>
+  <div class="nx"><button class="ghost" id="pv">← Anterior</button><span class="c" id="ct"></span><button id="nt">Siguiente →</button></div>
+ </article>
+</section>
+<nav class="bar" id="br" aria-label="Ir a otras páginas"></nav>
+<script>
+/* ===== EDIT HERE: texts and Google Sites page addresses ===== */
+var PAGES=[ /* paste each page's published address in url */
+ {t:"Presentación",url:""},
+ {t:"Contenido académico",url:""},
+ {t:"Aprendizaje colaborativo",url:""},
+ {t:"Conclusiones",url:""},
+ {t:"Autoría",url:""}];
+var FOOT="© 2026 Equipo Nexus. Este sitio se publica bajo una licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional (CC BY-SA 4.0). Las imágenes y los textos de terceros conservan sus propias licencias.";
+var S=[
+ {t:"Problema general",
+  x:["En Perú, las pequeñas y micro empresas (MYPE) representan el 99,1 % de las 2,34 millones de empresas formales registradas en 2024 y aportan el 20,2 % del PBI (Ministerio de la Producción [PRODUCE], 2025). Sin embargo, la importancia de sus inventarios varía considerablemente, al igual que la forma en que la mayoría de estos negocios gestionan sus existencias: recurriendo a pequeños libros de registro, hojas de cálculo sin actualizar o, simplemente, a la memoria del propietario.",
+     "El resultado es un problema silencioso de doble vertiente: por un lado, los productos se acumulan, inmovilizando capital; por otro, la escasez provoca la pérdida de ventas y de clientes. Este sitio web analiza las causas fundamentales de este desequilibrio y explora diversas herramientas, desde software local básico hasta tecnología RFID, que pueden contribuir a ofrecer una solución."]},
+ {t:"Resumen de la problemática",
+  x:["En el Perú, las micro y pequeñas empresas (MYPE) constituyen el 99,1 % del sector empresarial formal y aportan el 20,2 % al PIB nacional; sin embargo, la mayoría gestiona sus inventarios de manera informal, ya sea mediante pequeños cuadernos de registro, sistemas manuales obsoletos o, simplemente, confiando en la memoria. Esta falta de control genera un doble problema: un exceso de inventario que inmoviliza capital, e ineficiencias que derivan en la pérdida de ventas y de clientes.",
+     "Por consiguiente, este sitio analiza las causas del desequilibrio y explora diversas soluciones, que van desde aplicaciones de software hasta tecnología RFID."]},
+ {t:"Importancia del tema de investigación",
+  x:["El estudio de este tema es importante porque el inventario suele ser uno de los activos más valiosos para una micro, pequeña o mediana empresa (MYPES); sin embargo, es a su vez, uno de los menos controlados. Rivero Sánchez et al. (2026) sostienen que la gestión eficiente de las existencias ya no es una mera tarea operativa, sino un factor estratégico del cual dependen la supervivencia y el desarrollo de una organización (p. 17).",
+     "Esta afirmación cobra aún mayor relevancia en el Perú, donde las MYPES representan el 86,5 % del empleo en el sector privado (PRODUCE, 2025). Cuando una MYPE pierde dinero debido a una deficiente planificación de las adquisiciones o a la caducidad de sus productos, no solo están en juego sus beneficios, sino también los puestos de trabajo que sostiene. Por consiguiente, comprender cómo se controla el inventario resulta fundamental para entender la sostenibilidad de la economía nacional."]},
+ {t:"Arquitectura del sitio",links:true,
+  x:["Esta sección representa una parte del recorrido desde el problema hasta la solución, y abarca cuatro temas que conforman una «escala de madurez digital» (Figura 2). En el apartado «Contenido académico», Natali analiza el estado inicial, la fiabilidad de los registros, sin el cual no es posible realizar un trabajo significativo; Fabio explica cómo la clasificación ABC ayuda a identificar los activos que requieren una gestión adecuada; Marghiory demuestra por qué una base de datos compartida, que abarca desde niveles básicos hasta avanzados, constituye el primer paso idóneo hacia la digitalización; y Franluis presenta la etapa: software basado en la nube, códigos de barras y tecnología RFID.",
+     "Asimismo, la sección titulada «Aprendizaje colaborativo» aborda el proceso de trabajo en equipo; «Resultados» resume la respuesta de cada integrante ante el problema; y «Autoría» identifica a los creadores del trabajo."]},
+ {t:"Limitaciones del equipo",
+  x:["Este trabajo presenta ciertas limitaciones que cabe señalar. En primer lugar, se basa en una revisión bibliográfica y no en trabajo de campo; el equipo no analizó directamente los registros de ninguna micro, pequeña o mediana empresa (MYPES). En segundo lugar, algunas fuentes provienen de contextos diversos —como un informe del Ministerio de Economía, Industria y Comercio de Costa Rica o un estudio realizado en una cadena minorista extranjera—, lo que implica que sus hallazgos deben interpretarse con cautela antes de aplicarlos al contexto peruano.",
+     "Por último, el equipo trabajó de forma remota y bajo estrictas limitaciones de tiempo, lo que obligó a centrarse en fuentes de fácil acceso. No obstante, cada referencia ha sido verificada con su documento original."]}
+];
+/* ============================================================ */
+var $=function(i){return document.getElementById(i)},cur=0,B=[],done=0;
+var v=$('v'),rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function compact(){document.body.classList.add('compact');v.pause()}
+function intro(){document.body.classList.remove('compact');$('pl').style.display='none';
+ try{v.currentTime=0;var p=v.play();if(p&&p.catch)p.catch(function(){$('pl').style.display='block'})}catch(e){}}
+v.addEventListener('ended',compact);
+$('sk').onclick=compact;$('rp').onclick=intro;
+$('pl').onclick=function(){$('pl').style.display='none';v.play()};
+v.addEventListener('timeupdate',function(){if(v.duration&&v.currentTime>v.duration-.05)compact()});
+function pageLinks(){return PAGES.map(function(p){return p.url?'<a class="btn" href="'+p.url+'" target="_top">'+p.t+'</a>':'<a class="btn off" aria-disabled="true">'+p.t+'</a>'}).join('')}
+/* steps */
+S.forEach(function(s,i){var b=document.createElement('button');b.type='button';b.className='st';
+ b.innerHTML='<i>'+(i+1)+'</i><span>'+s.t+'</span>';b.onclick=function(){go(i)};$('st').appendChild(b);B.push(b)});
+function go(i){cur=i;done=Math.max(done,i);var s=S[i];
+ B.forEach(function(b,k){b.classList.toggle('on',k===i);b.classList.toggle('done',k<done&&k!==i)});
+ $('tx').innerHTML='<h2>'+s.t+'</h2>'+s.x.map(function(p){return'<p>'+p+'</p>'}).join('')+(s.links?'<div class="go"><span class="tag" style="width:100%">Ir directamente a</span>'+pageLinks()+'</div>':'');
+ $('tx').scrollTop=0;
+ $('ct').textContent=(i+1)+' de '+S.length;$('pg').style.width=((i+1)/S.length*100)+'%';
+ $('pv').disabled=i===0;$('nt').textContent=i===S.length-1?'Volver al inicio ↺':'Siguiente →'}
+$('pv').onclick=function(){if(cur>0)go(cur-1)};
+$('nt').onclick=function(){go(cur===S.length-1?0:cur+1)};
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')$('nt').click();if(e.key==='ArrowLeft')$('pv').click()});
+/* bottom bar */
+$('br').innerHTML='<span>Ir a:</span>'+PAGES.map(function(p){return p.url?'<a href="'+p.url+'" target="_top">'+p.t+'</a>':'<a style="opacity:.45;pointer-events:none">'+p.t+'</a>'}).join('')+'<div class="ft">'+FOOT+'</div>';
+go(0);
+/* start: ?final or reduced motion skips the intro */
+if(rm||/[?&]final/.test(location.search))compact();else intro();
+</script></body></html>
